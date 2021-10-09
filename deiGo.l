@@ -1,3 +1,6 @@
+%{
+int yycolumnno = 1;
+%}
 id      [a-zA-Z_][a-zA-Z_0-9]*
 O       0[0-7]+
 H       0x[0-9a-fA-F]+
@@ -6,12 +9,14 @@ reserved                    (break|case|chan|const|continue|default|defer|fallth
 letter                      [a-zA-Z]
 digit                       [0-9]
 newline                     \r\n|\n
+illegal_character         [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
 %%
 
  // tokens deiGo
 
  // STRLIT: seq carateres exceto "carriage return", "newline", "" E/OU sequencias de escape entre aspas duplas; apenas sequencias \f, \n, \r, \t, \\ e \ são da linguagem" 
  // REALLIT: 12. ; 12.5 ; 12.5e+13 ; 12.5e-13 ; 12.e+13 ; 12.e-13 ; 12e+13 ; 12e-13   -> e minúsculo ou E maiúsculo ; sinal opcional
+
 
 " "         {;}
 {reserved}    {printf("RESERVED\r\n");}
@@ -67,7 +72,7 @@ newline                     \r\n|\n
 
 
 {id}        {printf("ID(%s)\r\n", yytext);}
-{id}{newline} {printf("ID(%s)\r\nSEMICOLON\r\n", yytext);}
+{id}{newline} {printf("ID(%s)\r\nSEMICOLON\r\n", yytext); yylineno++;}
 
 {O}         {printf("INTLIT(%s)\r\n", yytext);}
 {O}{newline}         {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
@@ -78,8 +83,9 @@ newline                     \r\n|\n
 
 
 
-\n    ;
-.   {ECHO;}
+{newline}    {yylineno++; yycolumnno=0;}
+
+.   {printf("Line <%d>, column <%d>: illegal character (<%s>)\r\n", yylineno, yycolumnno, yytext);}
 
 %%
 int main()

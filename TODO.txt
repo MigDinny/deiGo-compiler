@@ -1,2 +1,7 @@
 - fazer reallit e strlit, E TESTAR
 - emitir um ; nas 4 regras previstas no enunciado. eu já o fiz para as ultimas 3 e para o INTLIT, falta para o REALLIT E STRLIT
+- programar comments
+- catch nos erros todos
+
+
+^[^\n]*$   {yycolumnno += (strlen(yytext)); REJECT;}
