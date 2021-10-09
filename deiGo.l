@@ -87,7 +87,7 @@ newline                             \r\n|\n
 (({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {
                                     printf("REALLIT(%s)\r\n", yytext);
                                     }
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {
+((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}){newline} {
                                     printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);
                                     }
 
