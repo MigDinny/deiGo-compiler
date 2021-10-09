@@ -1,0 +1,12 @@
+Line 1, column 1: unterminated string literal
+Line 2, column 3: invalid escape sequence (\b)
+Line 2, column 1: unterminated string literal
+Line 3, column 14: invalid escape sequence (\b)
+Line 4, column 6: invalid escape sequence (\ )
+Line 4, column 8: invalid escape sequence (\)
+Line 4, column 1: unterminated string literal
+Line 5, column 1: unterminated string literal
+STRLIT(" FUNCIONA ")
+SEMICOLON
+Line 7, column 3: invalid escape sequence (\)
+Line 7, column 1: unterminated string literal

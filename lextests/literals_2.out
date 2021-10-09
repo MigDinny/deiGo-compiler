@@ -1,0 +1,14 @@
+STRLIT("lawjhd")
+SEMICOLON
+STRLIT("alkdha")
+SEMICOLON
+STRLIT("")
+SEMICOLON
+STRLIT(" awdlwjahda")
+SEMICOLON
+STRLIT(" continue break int ")
+SEMICOLON
+STRLIT(" \"Hello World \r")
+SEMICOLON
+STRLIT("\t\t \"STRING\"")
+SEMICOLON

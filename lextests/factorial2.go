@@ -29,4 +29,6 @@ func main() {
     var cons oct  = 0x12a349;
     var cons oct3 = 01234;
     var cons oct2 = 012a349;
+
+    /*
 };
