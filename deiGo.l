@@ -1,111 +1,138 @@
+id                                  [a-zA-Z_][a-zA-Z_0-9]*
+O                                   0[0-7]+
+H                                   0x[0-9a-fA-F]+
+d                                   [0-9]*
+D                                   [0-9]+
+reserved                            (break|case|chan|const|continue|default|defer|fallthrough|go|goto|import|interface|map|range|select|struct|switch|type|"++"|"--")
+ch                                  [a-zA-Z]
+exp                                 [eE]
+sig                                 [-+]
+esc                                 (\f|\n|\r|\t|\\|\")* 
+strlit                              ("carriage return"|"newline"|\"\")             
+newline                             \r\n|\n
+illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
+
 %{
-int yycolumnno = 1;
+    int flagL = 0;
+    char left_bracket = '(';
+    int yycolumnno = 1;
 %}
-id      [a-zA-Z_][a-zA-Z_0-9]*
-O       0[0-7]+
-H       0x[0-9a-fA-F]+
-d                           [0-9]*
-D       [0-9]+
-reserved                    (break|case|chan|const|continue|default|defer|fallthrough|go|goto|import|interface|map|range|select|struct|switch|type|"++"|"--")
-ch                          [a-zA-Z]
-exp                         [eE]
-sig                         [-+]
-esc                         (\f|\n|\r|\t|\\|\")* 
-strlit                      ("carriage return"|"newline"|\"\")             
-newline                     \r\n|\n
-illegal_character         [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
+
+%X SINGLECOMM DOUBLECOMM STRLIT
 %%
 
- // tokens deiGo
+" "                                 {;}                                
 
- // STRLIT: seq carateres exceto "carriage return", "newline", "" E/OU sequencias de escape entre aspas duplas; apenas sequencias \f, \n, \r, \t, \\ e \ são da linguagem" 
- // REALLIT: 12. ; 12.5 ; 12.5e+13 ; 12.5e-13 ; 12.e+13 ; 12.e-13 ; 12e+13 ; 12e-13   -> e minúsculo ou E maiúsculo ; sinal opcional
+{reserved}                          {if (flagL) printf("RESERVED\r\n");}
 
-" "                         {;}
-{reserved}                  {printf("RESERVED\r\n");}
+";"                                 {if (flagL) printf("SEMICOLON\r\n");}
+","                                 {if (flagL) printf("COMMA\r\n");}
+"_"                                 {if (flagL) printf("BLANKID\r\n");}
+"="                                 {if (flagL) printf("ASSIGN\r\n");}
+"*"                                 {if (flagL) printf("STAR\r\n");}
+"/"                                 {if (flagL) printf("DIV\r\n");}
+"-"                                 {if (flagL) printf("MINUS\r\n");}
+"+"                                 {if (flagL) printf("PLUS\r\n");}
+"=="                                {if (flagL) printf("EQ\r\n");}
+">="                                {if (flagL) printf("GE\r\n");}
+">"                                 {if (flagL) printf("GT\r\n");}
+"{"                                 {if (flagL) printf("LBRACE\r\n");}
+"<="                                {if (flagL) printf("LE\r\n");}
+"("                                 {if (flagL) printf("LPAR\r\n");}
+"["                                 {if (flagL) printf("LSQ\r\n");}
+"<"                                 {if (flagL) printf("LT\r\n");}
+"%"                                 {if (flagL) printf("MOD\r\n");}
+"!="                                {if (flagL) printf("NE\r\n");}
+"!"                                 {if (flagL) printf("NOT\r\n");}
+"&&"                                {if (flagL) printf("AND\r\n");}
+"||"                                {if (flagL) printf("OR\r\n");}
 
-";"                         {printf("SEMICOLON\r\n");}
-","                         {printf("COMMA\r\n");}
-"_"                         {printf("BLANKID\r\n");}
-"="                         {printf("ASSIGN\r\n");}
-"*"                         {printf("STAR\r\n");}
-"//"                        {printf("DIV\r\n");}
-"-"                         {printf("MINUS\r\n");}
-"+"                         {printf("PLUS\r\n");}
-"=="                        {printf("EQ\r\n");}
-">="                        {printf("GE\r\n");}
-">"                         {printf("GT\r\n");}
-"{"                         {printf("LBRACE\r\n");}
-"<="                        {printf("LE\r\n");}
-"("                         {printf("LPAR\r\n");}
-"["                         {printf("LSQ\r\n");}
-"<"                         {printf("LT\r\n");}
-"%"                         {printf("MOD\r\n");}
-"!="                        {printf("NE\r\n");}
-"!"                         {printf("NOT\r\n");}
-"&&"                        {printf("AND\r\n");}
-"||"                        {printf("OR\r\n");}
+"}"                                 {if (flagL) printf("RBRACE\r\n");}
+"}"{newline}                        {if (flagL) printf("RBRACE\r\nSEMICOLON\r\n"); yylineno++;}
 
-"}"                         {printf("RBRACE\r\n");}
-"}"{newline}                {printf("RBRACE\r\nSEMICOLON\r\n");}
+")"                                 {if (flagL) printf("RPAR\r\n");}
+")"{newline}                        {if (flagL) printf("RPAR\r\nSEMICOLON\r\n"); yylineno++;}
 
-")"                         {printf("RPAR\r\n");}
-")"{newline}                {printf("RPAR\r\nSEMICOLON\r\n");}
+"]"                                 {if (flagL) printf("RSQ\r\n");}
+"]"{newline}                        {if (flagL) printf("RSQ\r\nSEMICOLON\r\n"); yylineno++;}
 
-"]"                         {printf("RSQ\r\n");}
-"]"{newline}                {printf("RSQ\r\nSEMICOLON\r\n");}
+"package"                           {if (flagL) printf("PACKAGE\r\n");}
 
-"package"                   {printf("PACKAGE\r\n");}
+"return"                            {if (flagL) printf("RETURN\r\n");}
+"return"{newline}                   {if (flagL) printf("RETURN\r\nSEMICOLON\r\n"); yylineno++;}
 
-"return"                    {printf("RETURN\r\n");}
-"return"{newline}           {printf("RETURN\r\nSEMICOLON\r\n");}
+"else"                              {if (flagL) printf("ELSE\r\n");}
+"for"                               {if (flagL) printf("FOR\r\n");}
+"if"                                {if (flagL) printf("IF\r\n");}
+"var"                               {if (flagL) printf("VAR\r\n");}
+"int"                               {if (flagL) printf("INT\r\n");}
+"float32"                           {if (flagL) printf("FLOAT32\r\n");}
+"bool"                              {if (flagL) printf("BOOL\r\n");}
+"string"                            {if (flagL) printf("STRING\r\n");}
+"fmt.Println"                       {if (flagL) printf("PRINT\r\n");}
+"strconv.Atoi"                      {if (flagL) printf("PARSEINT\r\n");}
+"func"                              {if (flagL) printf("FUNC\r\n");}
+"os.Args"                           {if (flagL) printf("CMDARGS\r\n");}
 
-"else"                      {printf("ELSE\r\n");}
-"for"                       {printf("FOR\r\n");}
-"if"                        {printf("IF\r\n");}
-"var"                       {printf("VAR\r\n");}
-"int"                       {printf("INT\r\n");}
-"float32"                   {printf("FLOAT32\r\n");}
-"bool"                      {printf("BOOL\r\n");}
-"string"                    {printf("STRING\r\n");}
-"fmt.Println"               {printf("PRINT\r\n");}
-"strconv.Atoi"              {printf("PARSEINT\r\n");}
-"func"                      {printf("FUNC\r\n");}
-"os.Args"                   {printf("CMDARGS\r\n");}
+{id}                                {if (flagL) printf("ID(%s)\r\n", yytext);}
+{id}\r\n                            {if (flagL) printf("ID(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
+{id}\n                              {if (flagL) printf("ID(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 1, yytext); yylineno++;}
 
-{id}                        {printf("ID(%s)\r\n", yytext);}
-{id}\r\n                    {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
-{id}\n                      {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}
+\"                                  {if (flagL) printf("STRLIT%c", left_bracket); BEGIN STRLIT;}
 
-\"[^{strlit}]*{esc}?\"      {printf("STRLIT(%s)\r\n", yytext);}
-\"[^{strlit}]*{esc}?\"{newline}      {printf("STRLIT(%s)\r\n", yytext);}
+<STRLIT>\n|\r\n                     {if (flagL) printf("%s", yytext);}
+<STRLIT>\\n|\\f|\\r|\\t|\\\"|\\\    {if (flagL) printf("%s", yytext);}
+<STRLIT>\"                          {if (flagL) printf(")\n"); BEGIN 0;}
+<STRLIT>\\.                         {printf("Line <>, column <>: invalid escape sequence (<%s>)\n", yytext);}
+<STRLIT>.                           {if (flagL) printf("%s", yytext);}
+<STRLIT><<EOF>>                     {printf("Line <%d>, column <%d>: unterminated string literal\r\n", yylineno, yycolumnno); BEGIN 0;}   
 
-{O}                         {printf("INTLIT(%s)\r\n", yytext);}
-{O}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
-{O}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
-{H}                         {printf("INTLIT(%s)\r\n", yytext);}
-{H}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
-{H}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
-{D}                         {printf("INTLIT(%s)\r\n", yytext);}
-{D}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
-{D}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{O}                                 {if (flagL) printf("INTLIT(%s)\r\n", yytext);}
+{O}\r\n                             {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
+{O}\n                               {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 1, yytext); yylineno++;}
 
+{H}                                 {if (flagL) printf("INTLIT(%s)\r\n", yytext);}
+{H}\r\n                             {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
+{H}\n                               {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 1, yytext); yylineno++;}
 
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {printf("REALLIT(%s)\r\n", yytext);}
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+0([0-7]*[89a-zA-Z]+[0-7]*)+         {printf("Line <%d>, column <%d>: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext);}
 
+{D}                                 {if (flagL) printf("INTLIT(%s)\r\n", yytext);}
+{D}\r\n                             {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
+{D}\n                               {if (flagL) printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 1, yytext); yylineno++;}         
 
-{newline}    {yylineno++; yycolumnno=0;}
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}              {if (flagL) printf("REALLIT(%s)\r\n", yytext);}
+((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {if (flagL) printf("REALLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
+((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {if (flagL) printf("REALLIT(%.*s)\r\nSEMICOLON\r\n", (int) strlen(yytext) - 1, yytext); yylineno++;}  
 
-.   {printf("Line <%d>, column <%d>: illegal character (<%s>)\r\n", yylineno, yycolumnno, yytext);}
+"//"                                {BEGIN SINGLECOMM;}
+"/*"                                {BEGIN DOUBLECOMM;}
+
+<SINGLECOMM>.                       ;
+<SINGLECOMM>{newline}               {BEGIN 0; yylineno++;}
+
+<DOUBLECOMM>.                       ;
+<DOUBLECOMM>{newline}               {yylineno++;}
+<DOUBLECOMM>"*/"                    {BEGIN 0;}
+<DOUBLECOMM><<EOF>>                 {printf("Line <%d>, column <%d>: unterminated comment\r\n", yylineno, yycolumnno); BEGIN 0;}
+
+{newline}                           {yylineno++; yycolumnno=0;}
+.                                   {printf("Line <%d>, column <%d>: illegal character (<%s>)\r\n", yylineno, yycolumnno, yytext);}
 
 %%
 
-int main()
+int main(int argc, char *argv[ ])
 {
-yylex(); return 0;
+    if (argc > 1) {
+        if (strcmp(argv[1], "-l") == 0) {
+            flagL = 1;
+        }
+    }
+
+    yylex();
+    return 0;
 }
 
 int yywrap() {
-return 1;
+    return 1;
 }
