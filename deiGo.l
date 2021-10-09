@@ -74,10 +74,7 @@ illegal_character         [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "os.Args"                   {printf("CMDARGS\r\n");}
 
 {id}                        {printf("ID(%s)\r\n", yytext);}
-{id}{newline}               {printf("ID(%s)\r\nSEMICOLON\r\n", yytext);}
-
-{id}        {printf("ID(%s)\r\n", yytext);}
-{id}{newline} {printf("ID(%s)\r\nSEMICOLON\r\n", yytext); yylineno++;}
+{id}{newline}               {printf("ID(%s)\r\nSEMICOLON\r\n", yytext); yylineno++;}
 
 \"[^{strlit}]*{esc}?\"      {printf("STRLIT(%s)\r\n", yytext);}
 \"[^{strlit}]*{esc}?\"{newline}      {printf("STRLIT(%s)\r\n", yytext);}
@@ -89,12 +86,8 @@ illegal_character         [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 {D}                         {printf("INTLIT(%s)\r\n", yytext);}
 {D}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {
-                            printf("REALLIT(%s)\r\n", yytext);
-                            }
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {
-                            printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);
-                            }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {printf("REALLIT(%s)\r\n", yytext);}
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 
 
 {newline}    {yylineno++; yycolumnno=0;}
