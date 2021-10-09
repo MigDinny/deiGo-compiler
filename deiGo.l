@@ -5,6 +5,7 @@ D       [0-9]+
 reserved                    (break|case|chan|const|continue|default|defer|fallthrough|go|goto|import|interface|map|range|select|struct|switch|type|"++"|"--")
 letter                      [a-zA-Z]
 digit                       [0-9]
+newline                     \r\n|\n
 %%
 
  // tokens deiGo
@@ -36,13 +37,19 @@ digit                       [0-9]
 "!"           {printf("NOT\r\n");}
 "&&"          {printf("AND\r\n");}
 "||"          {printf("OR\r\n");}
+
 "}"         {printf("RBRACE\r\n");}
+"}"{newline}         {printf("RBRACE\r\nSEMICOLON\r\n");}
+
 ")"         {printf("RPAR\r\n");}
+")"{newline}         {printf("RPAR\r\nSEMICOLON\r\n");}
 
 "]"                         {printf("RSQ\r\n");}
+"]"{newline}                         {printf("RSQ\r\nSEMICOLON\r\n");}
+
 "package"                   {printf("PACKAGE\r\n");}
 
-"return"\r\n                  {printf("RETURN\r\nSEMICOLON\r\n");}
+"return"{newline}                 {printf("RETURN\r\nSEMICOLON\r\n");}
 "return"                    {printf("RETURN\r\n");}
 
 "else"                      {printf("ELSE\r\n");}
@@ -60,10 +67,14 @@ digit                       [0-9]
 
 
 {id}        {printf("ID(%s)\r\n", yytext);}
-{O}         {printf("INTLIT(%s)\r\n", yytext);}
-{H}         {printf("INTLIT(%s)\r\n", yytext);}
-{D}         {printf("INTLIT(%s)\r\n", yytext);}
+{id}{newline} {printf("ID(%s)\r\nSEMICOLON\r\n", yytext);}
 
+{O}         {printf("INTLIT(%s)\r\n", yytext);}
+{O}{newline}         {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{H}         {printf("INTLIT(%s)\r\n", yytext);}
+{H}{newline}         {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{D}         {printf("INTLIT(%s)\r\n", yytext);}
+{D}{newline}         {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 
 
 
