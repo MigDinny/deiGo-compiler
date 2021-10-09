@@ -13,56 +13,56 @@ digit                       [0-9]
  // REALLIT: 12. ; 12.5 ; 12.5e+13 ; 12.5e-13 ; 12.e+13 ; 12.e-13 ; 12e+13 ; 12e-13   -> e minúsculo ou E maiúsculo ; sinal opcional
 
 " "         {;}
-{reserved}    {printf("RESERVED\n");}
+{reserved}    {printf("RESERVED\r\n");}
 
-";"           {printf("SEMICOLON\n");}
-","           {printf("COMMA\n");}
-"_"             {printf("BLANKID\n");}
-"="           {printf("ASSIGN\n");}
-"*"           {printf("STAR\n");}
-"//"          {printf("DIV\n");}
-"-"           {printf("MINUS\n");}
-"+"         {printf("PLUS\n");}
-"=="         {printf("EQ\n");}
-">="         {printf("GE\n");}
-">"         {printf("GT\n");}
-"{"         {printf("LBRACE\n");}
-"<="         {printf("LE\n");}
-"("         {printf("LPAR\n");}
-"["         {printf("LSQ\n");}
-"<"         {printf("LT\n");}
-"%"         {printf("MOD\n");}
-"!="         {printf("NE\n");}
-"!"           {printf("NOT\n");}
-"&&"          {printf("AND\n");}
-"||"          {printf("OR\n");}
-"}"         {printf("RBRACE\n");}
-")"         {printf("RPAR\n");}
+";"           {printf("SEMICOLON\r\n");}
+","           {printf("COMMA\r\n");}
+"_"             {printf("BLANKID\r\n");}
+"="           {printf("ASSIGN\r\n");}
+"*"           {printf("STAR\r\n");}
+"//"          {printf("DIV\r\n");}
+"-"           {printf("MINUS\r\n");}
+"+"         {printf("PLUS\r\n");}
+"=="         {printf("EQ\r\n");}
+">="         {printf("GE\r\n");}
+">"         {printf("GT\r\n");}
+"{"         {printf("LBRACE\r\n");}
+"<="         {printf("LE\r\n");}
+"("         {printf("LPAR\r\n");}
+"["         {printf("LSQ\r\n");}
+"<"         {printf("LT\r\n");}
+"%"         {printf("MOD\r\n");}
+"!="         {printf("NE\r\n");}
+"!"           {printf("NOT\r\n");}
+"&&"          {printf("AND\r\n");}
+"||"          {printf("OR\r\n");}
+"}"         {printf("RBRACE\r\n");}
+")"         {printf("RPAR\r\n");}
 
-"]"                         {printf("RSQ\n");}
-"package"                   {printf("PACKAGE\n");}
+"]"                         {printf("RSQ\r\n");}
+"package"                   {printf("PACKAGE\r\n");}
 
-"return"\n                  {printf("RETURN\nSEMICOLON\n");}
-"return"                    {printf("RETURN\n");}
+"return"\r\n                  {printf("RETURN\r\nSEMICOLON\r\n");}
+"return"                    {printf("RETURN\r\n");}
 
-"else"                      {printf("ELSE\n");}
-"for"                       {printf("FOR\n");}
-"if"                        {printf("IF\n");}
-"var"                       {printf("VAR\n");}
-"int"                       {printf("INT\n");}
-"float32"                   {printf("FLOAT32\n");}
-"bool"                      {printf("BOOL\n");}
-"string"                    {printf("STRING\n");}
-"fmt.Println"               {printf("PRINT\n");}
-"strconv.Atoi"              {printf("PARSEINT\n");}
-"func"                      {printf("FUNC\n");}
-"os.Args"                   {printf("CMDARGS\n");}
+"else"                      {printf("ELSE\r\n");}
+"for"                       {printf("FOR\r\n");}
+"if"                        {printf("IF\r\n");}
+"var"                       {printf("VAR\r\n");}
+"int"                       {printf("INT\r\n");}
+"float32"                   {printf("FLOAT32\r\n");}
+"bool"                      {printf("BOOL\r\n");}
+"string"                    {printf("STRING\r\n");}
+"fmt.Println"               {printf("PRINT\r\n");}
+"strconv.Atoi"              {printf("PARSEINT\r\n");}
+"func"                      {printf("FUNC\r\n");}
+"os.Args"                   {printf("CMDARGS\r\n");}
 
 
-{id}        {printf("ID(%s)\n", yytext);}
-{O}         {printf("INTLIT(%s)\n", yytext);}
-{H}         {printf("INTLIT(%s)\n", yytext);}
-{D}         {printf("INTLIT(%s)\n", yytext);}
+{id}        {printf("ID(%s)\r\n", yytext);}
+{O}         {printf("INTLIT(%s)\r\n", yytext);}
+{H}         {printf("INTLIT(%s)\r\n", yytext);}
+{D}         {printf("INTLIT(%s)\r\n", yytext);}
 
 
 
