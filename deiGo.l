@@ -10,13 +10,17 @@ sig                                 [-+]
 esc                                 (\f|\n|\r|\t|\\|\")* 
 strlit                              ("carriage return"|"newline"|\"\")             
 newline                             \r\n|\n
+illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
 
 %{
-    int line, column = 1;
+    char left_bracket = '(';
+    int yycolumnno = 1;
 %}
 
-%X SINGLECOMM DOUBLECOMM
+%X SINGLECOMM DOUBLECOMM STRLIT
 %%
+
+" "                                 {;}                                
 
 {reserved}                          {printf("RESERVED\r\n");}
 
@@ -43,18 +47,18 @@ newline                             \r\n|\n
 "||"                                {printf("OR\r\n");}
 
 "}"                                 {printf("RBRACE\r\n");}
-"}"{newline}                        {printf("RBRACE\r\nSEMICOLON\r\n");}
+"}"{newline}                        {printf("RBRACE\r\nSEMICOLON\r\n"); yylineno++;}
 
 ")"                                 {printf("RPAR\r\n");}
-")"{newline}                        {printf("RPAR\r\nSEMICOLON\r\n");}
+")"{newline}                        {printf("RPAR\r\nSEMICOLON\r\n"); yylineno++;}
 
 "]"                                 {printf("RSQ\r\n");}
-"]"{newline}                        {printf("RSQ\r\nSEMICOLON\r\n");}
+"]"{newline}                        {printf("RSQ\r\nSEMICOLON\r\n"); yylineno++;}
 
 "package"                           {printf("PACKAGE\r\n");}
 
 "return"                            {printf("RETURN\r\n");}
-"return"{newline}                   {printf("RETURN\r\nSEMICOLON\r\n");}
+"return"{newline}                   {printf("RETURN\r\nSEMICOLON\r\n"); yylineno++;}
 
 "else"                              {printf("ELSE\r\n");}
 "for"                               {printf("FOR\r\n");}
@@ -70,41 +74,46 @@ newline                             \r\n|\n
 "os.Args"                           {printf("CMDARGS\r\n");}
 
 {id}                                {printf("ID(%s)\r\n", yytext);}
-{id}{newline}                       {printf("ID(%s)\r\nSEMICOLON\r\n", yytext);}
+{id}\r\n                            {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+{id}\n                              {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}
 
-\"[^{strlit}]*{esc}?\"              {printf("STRLIT(%s)\r\n", yytext);}
-\"[^{strlit}]*{esc}?\"{newline}     {
-                                    printf("STRLIT(%s)\r\n", yytext);
-                                    }
+\"                                  {printf("STRLIT%c\r\n", left_bracket); BEGIN STRLIT;}
+
+<STRLIT>\n|\r\n                     {ECHO;}
+<STRLIT>\\n|\\f|\\r|\\t|\\\"|\\\    {ECHO;}
+<STRLIT>\"                          {printf(")"); BEGIN 0;}
+<STRLIT>.                           {ECHO;}
+<STRLIT><<EOF>>                     {printf("Line <%d>, column <%d>: unterminated string literal\r\n", yylineno, yycolumnno);}   
 
 {O}                                 {printf("INTLIT(%s)\r\n", yytext);}
-{O}{newline}                        {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{O}\r\n                             {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+{O}\n                               {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}
+
 {H}                                 {printf("INTLIT(%s)\r\n", yytext);}
-{H}{newline}                        {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{H}\r\n                             {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+{H}\n                               {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}
+
 {D}                                 {printf("INTLIT(%s)\r\n", yytext);}
-{D}{newline}                        {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{D}\r\n                             {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+{D}\n                               {printf("INTLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}         
 
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {
-                                    printf("REALLIT(%s)\r\n", yytext);
-                                    }
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {
-                                    printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);
-                                    }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}              {printf("REALLIT(%s)\r\n", yytext);}
+((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {printf("REALLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {printf("REALLIT(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}  
 
-" "|"\t"                            {column++;}
-"\n"|"\r\n"|"\r"                    {column = 0; line++;}
+"//"                                {BEGIN SINGLECOMM;}
+"/*"                                {BEGIN DOUBLECOMM;}
 
-"//"                                {column += 2; BEGIN SINGLECOMM;}
-"/*"                                {column += 2; BEGIN DOUBLECOMM;}
+<SINGLECOMM>.                       ;
+<SINGLECOMM>{newline}               {BEGIN 0; yylineno++;}
 
-<SINGLECOMM>.                       {;}
-<SINGLECOMM>"\n"|"\r\n"|"\r"        {column = 0; line ++; BEGIN 0;}
+<DOUBLECOMM>.                       ;
+<DOUBLECOMM>{newline}               {yylineno++;}
+<DOUBLECOMM>"*/"                    {BEGIN 0;}
+<DOUBLECOMM><<EOF>>                 {printf("Line <%d>, column <%d>: unterminated comment\r\n", yylineno, yycolumnno);}
 
-<DOUBLECOMM>.                       {column++;}
-<DOUBLECOMM>"\n"|"\r\n"|"\r"        {column = 0; line ++;}
-<DOUBLECOMM>"*/"                    {column += 2; BEGIN 0;}
-
-.                                   {ECHO;}
+{newline}                           {yylineno++; yycolumnno=0;}
+.                                   {printf("Line <%d>, column <%d>: illegal character (<%s>)\r\n", yylineno, yycolumnno, yytext);}
 
 %%
 
