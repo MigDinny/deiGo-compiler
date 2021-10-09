@@ -74,17 +74,22 @@ illegal_character         [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "os.Args"                   {printf("CMDARGS\r\n");}
 
 {id}                        {printf("ID(%s)\r\n", yytext);}
-{id}{newline}               {printf("ID(%s)\r\nSEMICOLON\r\n", yytext); yylineno++;}
+{id}\r\n                    {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 2, yytext); yylineno++;}
+{id}\n                      {printf("ID(%.*s)\r\nSEMICOLON\r\n", strlen(yytext) - 1, yytext); yylineno++;}
 
 \"[^{strlit}]*{esc}?\"      {printf("STRLIT(%s)\r\n", yytext);}
 \"[^{strlit}]*{esc}?\"{newline}      {printf("STRLIT(%s)\r\n", yytext);}
 
 {O}                         {printf("INTLIT(%s)\r\n", yytext);}
 {O}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{O}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 {H}                         {printf("INTLIT(%s)\r\n", yytext);}
+{H}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 {H}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
 {D}                         {printf("INTLIT(%s)\r\n", yytext);}
 {D}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+{D}{newline}                {printf("INTLIT(%s)\r\nSEMICOLON\r\n", yytext);}
+
 
 (({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D} {printf("REALLIT(%s)\r\n", yytext);}
 (({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}{newline} {printf("REALLIT(%s)\r\nSEMICOLON\r\n", yytext);}
