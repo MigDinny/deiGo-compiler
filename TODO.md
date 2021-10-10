@@ -28,3 +28,5 @@ resto
 ## NOTAS
 
 ^[^\n]*$   {yycolumnno += (strlen(yytext)); REJECT;}
+
+./gocompiler -l < lextests/text_1.dgo | colordiff --strip-trailing-cr lextests/text_2.out -
