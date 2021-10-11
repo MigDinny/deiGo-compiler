@@ -5,8 +5,8 @@ ALEXY
 - [x] blank_1
 - [x] comments_1
 - [x] comments_2
-- [ ] comments_bad_1
-- [ ] comments_bad_2
+- [x] comments_bad_1
+- [x] comments_bad_2
 - [x] empty_1
 - [ ] factorial
 - [ ] ids_keywords1
