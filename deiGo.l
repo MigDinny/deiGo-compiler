@@ -13,6 +13,7 @@ newline                             \r\n|\n
 illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
 
 %{
+    int initLine = 0, initColumn = 0;
     int flagL = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
@@ -105,8 +106,8 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;}
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;}  
 
-"//"                                {BEGIN SINGLECOMM;}
-"/*"                                {BEGIN DOUBLECOMM;}
+"//"                                {BEGIN SINGLECOMM; initLine = yylineno; initColumn = yycolumnno;}
+"/*"                                {BEGIN DOUBLECOMM; initLine = yylineno; initColumn = yycolumnno;}
 
 <SINGLECOMM>.                       {;}
 <SINGLECOMM>{newline}               {BEGIN 0; yylineno++;}
@@ -114,7 +115,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM>.                       {;}
 <DOUBLECOMM>{newline}               {yylineno++;}
 <DOUBLECOMM>"*/"                    {BEGIN 0;}
-<DOUBLECOMM><<EOF>>                 {printf("Line <%d>, column <%d>: unterminated comment\n", yylineno, yycolumnno); BEGIN 0;}
+<DOUBLECOMM><<EOF>>                 {printf("Line <%d>, column <%d>: unterminated comment\n", initLine, yycolumnno); BEGIN 0;}
 
 {newline}                           {yylineno++; yycolumnno=0;}
 .                                   {printf("Line <%d>, column <%d>: illegal character (<%s>)\n", yylineno, yycolumnno, yytext);}
