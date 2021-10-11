@@ -2,12 +2,12 @@
 
 ALEXY
 
-- [ ] blank_1
-- [ ] comments_1
-- [ ] comments_2
+- [x] blank_1
+- [x] comments_1
+- [x] comments_2
 - [ ] comments_bad_1
 - [ ] comments_bad_2
-- [ ] empty_1
+- [x] empty_1
 - [ ] factorial
 - [ ] ids_keywords1
 - [ ] ids_keywords2
