@@ -13,6 +13,7 @@ newline                             \r\n|\n
 illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\] 
 
 %{
+    int initialLine, initialColumn = 1;
     int flagL = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
@@ -23,7 +24,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 
 " "                                 {yycolumnno += yyleng; }                                
 
-{reserved}                          {if (flagL) printf("RESERVED\n"); yycolumnno += yyleng; }
+{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; }
 
 ";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; }
 ","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; }
@@ -105,8 +106,8 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1; }  
 
-"//"                                {BEGIN SINGLECOMM; yycolumnno += yyleng; }
-"/*"                                {BEGIN DOUBLECOMM; yycolumnno += yyleng; }
+"//"                                {BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"/*"                                {BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 <SINGLECOMM>.                       {yycolumnno += yyleng; }
 <SINGLECOMM>{newline}               {BEGIN 0; yylineno++;  yycolumnno = 1; }
@@ -114,7 +115,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM>.                       {yycolumnno += yyleng; }
 <DOUBLECOMM>{newline}               {yylineno++;  yycolumnno = 1; }
 <DOUBLECOMM>"*/"                    {BEGIN 0; yycolumnno += yyleng; }
-<DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", yylineno, yycolumnno); BEGIN 0; yycolumnno += yyleng; }
+<DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }
 
 {newline}                           {yylineno++; yycolumnno = 1; }
 .                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
