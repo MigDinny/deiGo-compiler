@@ -17,10 +17,7 @@
 
 **MIGUEL**
 
-- [ ] resto
-- [ ] colunas
-- [ ] inserir valores das linhas e colunas nos erros
-- [ ] passar pelos testes do Mooshak (momento de rezar)
+- [ ] resto dos testes
 
 **SUBMISSÕES**
 
