@@ -8,11 +8,11 @@ ALEXY
 - [x] comments_bad_1
 - [x] comments_bad_2
 - [x] empty_1
-- [ ] factorial
-- [ ] ids_keywords1
-- [ ] ids_keywords2
-- [ ] ids_keywords3
-- [ ] semicolons_1
+- [x] factorial
+- [x] ids_keywords1
+- [x] ids_keywords2
+- [x] ids_keywords3
+- [ ] semicolons_1 > STRLIT("Line 12, column 7: unterminated string literal     --> não devia aparecer o STRLIT, mas sim o erro apenas
 - [ ] semicolons_2
 
 MIGUEL
