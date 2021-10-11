@@ -26,7 +26,6 @@ MIGUEL
 
 ## NOTAS
 
-^[^\n]*$   {yycolumnno += (strlen(yytext)); REJECT;}
-
-./compile.sh deiGo.l gocompiler
+^[^\n]*$   {yycolumnno += (strlen(yytext)); REJECT;} <br>
+./compile.sh deiGo.l gocompiler <br>
 ./gocompiler -l < lextests/text_1.dgo | colordiff --strip-trailing-cr lextests/text_2.out -
