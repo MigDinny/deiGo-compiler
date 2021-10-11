@@ -66,7 +66,9 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "for"                               {if (flagL) printf("FOR\n"); yycolumnno += yyleng; }
 "if"                                {if (flagL) printf("IF\n"); yycolumnno += yyleng; }
 "var"                               {if (flagL) printf("VAR\n"); yycolumnno += yyleng; }
-"int"                               {if (flagL) printf("INT\n"); yycolumnno += yyleng; }
+
+"int"|"int"\n|"int"\r\n             {if (flagL) printf("INT\n"); yycolumnno += yyleng; }
+
 "float32"                           {if (flagL) printf("FLOAT32\n"); yycolumnno += yyleng; }
 "bool"                              {if (flagL) printf("BOOL\n"); yycolumnno += yyleng; }
 "string"                            {if (flagL) printf("STRING\n"); yycolumnno += yyleng; }
@@ -79,11 +81,12 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 {id}\r\n                            {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
 {id}\n                              {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1; }
 
-\"                                  {if (flagL) printf("STRLIT%c", left_bracket); BEGIN STRLIT; yycolumnno += yyleng; }
+\"                                  {if (flagL) printf("STRLIT%c\"", left_bracket); BEGIN STRLIT; yycolumnno += yyleng; }
 
-<STRLIT>\n|\r\n                     {if (flagL) printf("%s", yytext); yycolumnno = 1; }
+<STRLIT>\n|\r\n                     {printf("Line %d, column %d: unterminated string literal\n", yylineno, yycolumnno); BEGIN 0; yycolumnno += yyleng; }
 <STRLIT>\\n|\\f|\\r|\\t|\\\"|\\\    {if (flagL) printf("%s", yytext); yycolumnno += yyleng; }
-<STRLIT>\"                          {if (flagL) printf(")\n"); BEGIN 0; yycolumnno += yyleng; }
+<STRLIT>\"" "|\"\n|\"\r\n           {if (flagL) printf("\")\n"); printf("SEMICOLON\n"); BEGIN 0; yycolumnno += yyleng; }     
+<STRLIT>\"                          {if (flagL) printf("\")\n"); BEGIN 0; yycolumnno += yyleng; }
 <STRLIT>\\.                         {printf("Line %d, column %d: invalid escape sequence (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
 <STRLIT>.                           {if (flagL) printf("%s", yytext); yycolumnno += yyleng; }
 <STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", yylineno, yycolumnno); BEGIN 0; yycolumnno += yyleng; }   
