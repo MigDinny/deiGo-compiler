@@ -8,10 +8,10 @@ ALEXY
 - [x] comments_bad_1
 - [x] comments_bad_2
 - [x] empty_1
-- [ ] factorial
-- [ ] ids_keywords1
-- [ ] ids_keywords2
-- [ ] ids_keywords3
+- [x] factorial
+- [x] ids_keywords1
+- [x] ids_keywords2
+- [x] ids_keywords3
 - [ ] semicolons_1
 - [ ] semicolons_2
 
