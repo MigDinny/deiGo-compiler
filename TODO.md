@@ -12,7 +12,7 @@ ALEXY
 - [x] ids_keywords1
 - [x] ids_keywords2
 - [x] ids_keywords3
-- [ ] semicolons_1 > STRLIT("Line 12, column 7: unterminated string literal     --> não devia aparecer o STRLIT, mas sim o erro apenas
+- [ ] semicolons_1 > PROBLEMA: os tokens que precisam de SEMICOLON, se estivermos no EOF e não houver mais nada à frente, não existe nada para pôr um SEMICOLON à frente
 - [ ] semicolons_2
 
 MIGUEL
