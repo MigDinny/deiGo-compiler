@@ -2,23 +2,22 @@
 
 ALEXY
 
-blank_1
-comments_1
-comments_2
-comments_bad_1
-comments_bad_2
-empty_1
-factorial
-ids_keywords1
-ids_keywords2
-ids_keywords3
-semicolons_1
-semicolons_2
+- [ ] blank_1
+- [ ] comments_1
+- [ ] comments_2
+- [ ] comments_bad_1
+- [ ] comments_bad_2
+- [ ] empty_1
+- [ ] factorial
+- [ ] ids_keywords1
+- [ ] ids_keywords2
+- [ ] ids_keywords3
+- [ ] semicolons_1
+- [ ] semicolons_2
 
 MIGUEL
 
-resto
-
+- [ ] resto
 - [ ] colunas
 - [ ] inserir valores das linhas e colunas nos erros
 - [ ] passar pelos testes do Mooshak (momento de rezar)
