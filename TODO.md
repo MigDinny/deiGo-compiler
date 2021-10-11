@@ -12,7 +12,7 @@ ALEXY
 - [x] ids_keywords1
 - [x] ids_keywords2
 - [x] ids_keywords3
-- [ ] semicolons_1 > existe um erro com INT e ID(int)
+- [ ] semicolons_1 > STRLIT("Line 12, column 7: unterminated string literal     --> não devia aparecer o STRLIT, mas sim o erro apenas
 - [ ] semicolons_2
 
 MIGUEL
