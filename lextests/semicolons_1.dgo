@@ -18,5 +18,3 @@ func main() {
     argument,_ = strconv.Atoi(os.Args[1])
     fmt.Println(factorial(argument))
 }
-
-12.12e-12//
