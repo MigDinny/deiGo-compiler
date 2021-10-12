@@ -25,13 +25,13 @@
 - [ ] C Identifiers and keywords 16/20
 - [x] D Operators, brackets and punctuation marks 10/10
 - [x] E Plain text 10/10
-- [x] F Comments 15/15
+- [ ] F Comments 10/15
 - [ ] G Numeric, char and real literals 20/30
 - [ ] H Illegal characters 0/20
 - [x] I Unterminated comments 10/10
 - [ ] J Invalid or unterminated string literals 0/20
 - [ ] K Automatic Insertion of Semicolons 12/20
-- [ ] L Miscellaneous 14/25
+- [ ] L Miscellaneous 16/25
 
 ## META 2
 
