@@ -62,7 +62,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "}"" "*"/*"                         {if (flagL) printf("RBRACE\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 ")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; flagEOF = 1; }
-")"" "*{newline}                        {if (flagL) printf("RPAR\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+")"" "*{newline}                    {if (flagL) printf("RPAR\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
 ")"" "*"//"                         {if (flagL) printf("RPAR\nSEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 ")"" "*"/*"                         {if (flagL) printf("RPAR\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
@@ -151,8 +151,8 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 (({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}              {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1; }  
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"//"   {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"/*"   {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"//"      {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"/*"      {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 
 <SINGLECOMM>.                       {yycolumnno += yyleng; }
