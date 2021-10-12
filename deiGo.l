@@ -15,8 +15,8 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 %{
     #include <stdio.h>
     #include <stdlib.h>
-   
-    int flagL, flagError, strlit_buffer_pos = 0;
+    int initialLine, initialColumn = 1;
+    int flagL, flagError, flagEOF, strlit_buffer_pos = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
     char *strlit_buffer;
@@ -26,9 +26,13 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 %X SINGLECOMM DOUBLECOMM STRLIT
 %%
 
-" "                                 {yycolumnno += yyleng; }                                
+" "                                 {yycolumnno += yyleng; }
+"//"                                {BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"/*"                                {BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }            
 
-{reserved}                          {if (flagL) printf("RESERVED\n"); yycolumnno += yyleng; }
+.*                                   {flagEOF = 0; REJECT;}
+
+{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; }
 
 ";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; }
 ","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; }
@@ -52,25 +56,36 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "&&"                                {if (flagL) printf("AND\n"); yycolumnno += yyleng; }
 "||"                                {if (flagL) printf("OR\n"); yycolumnno += yyleng; }
 
-"}"                                 {if (flagL) printf("RBRACE\n"); yycolumnno += yyleng; }
-"}"{newline}                        {if (flagL) printf("RBRACE\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"}"                                 {if (flagL) printf("RBRACE\n"); yycolumnno += yyleng; flagEOF = 1; }
+"}"" "*{newline}                    {if (flagL) printf("RBRACE\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"}"" "*"//"                         {if (flagL) printf("RBRACE\nSEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"}"" "*"/*"                         {if (flagL) printf("RBRACE\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
-")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; }
-")"{newline}                        {if (flagL) printf("RPAR\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; flagEOF = 1; }
+")"" "*{newline}                        {if (flagL) printf("RPAR\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+")"" "*"//"                         {if (flagL) printf("RPAR\nSEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+")"" "*"/*"                         {if (flagL) printf("RPAR\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
-"]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; }
-"]"{newline}                        {if (flagL) printf("RSQ\r\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; }
+"]"" "*{newline}                    {if (flagL) printf("RSQ\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"]"" "*"//"                         {if (flagL) printf("RSQ\nSEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"]"" "*"/*"                         {if (flagL) printf("RSQ\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 "package"                           {if (flagL) printf("PACKAGE\n"); yycolumnno += yyleng; }
 
-"return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; }
-"return"{newline}                   {if (flagL) printf("RETURN\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; }
+"return"" "*{newline}               {if (flagL) printf("RETURN\nSEMICOLON\n"); yylineno++; yycolumnno += yyleng; }
+"return"" "*"//"                    {if (flagL) printf("RETURN\nSEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"return"" "*"/*"                    {if (flagL) printf("RETURN\nSEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 "else"                              {if (flagL) printf("ELSE\n"); yycolumnno += yyleng; }
 "for"                               {if (flagL) printf("FOR\n"); yycolumnno += yyleng; }
 "if"                                {if (flagL) printf("IF\n"); yycolumnno += yyleng; }
 "var"                               {if (flagL) printf("VAR\n"); yycolumnno += yyleng; }
+
 "int"                               {if (flagL) printf("INT\n"); yycolumnno += yyleng; }
+"int"{newline}                      {if (flagL) printf("INT\n"); yylineno++; yycolumnno = 1; }
+
 "float32"                           {if (flagL) printf("FLOAT32\n"); yycolumnno += yyleng; }
 "bool"                              {if (flagL) printf("BOOL\n"); yycolumnno += yyleng; }
 "string"                            {if (flagL) printf("STRING\n"); yycolumnno += yyleng; }
@@ -79,49 +94,66 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "func"                              {if (flagL) printf("FUNC\n"); yycolumnno += yyleng; }
 "os.Args"                           {if (flagL) printf("CMDARGS\n"); yycolumnno += yyleng; }
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; }
-{id}\r\n                            {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
-{id}\n                              {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1; }
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
+{id}" "*\r\n                        {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
+{id}" "*\n                          {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1;}
+{id}" "*"//"                        {if (flagL) printf("ID(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+{id}" "*"/*"                        {if (flagL) printf("ID(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 \"                                  {BEGIN STRLIT; yycolumnno += yyleng; }
 
-<STRLIT>\n|\r\n                     {if (flagL) printf("%s", yytext); yycolumnno = 1; }
-<STRLIT>\\n|\\f|\\r|\\t|\\\"|\\\    {if (flagL) printf("%s", yytext); yycolumnno += yyleng; }
-<STRLIT>\"                          {if (flagL && !flagError) printf("STRLIT(%s)\n", strlit_buffer); BEGIN 0; yycolumnno += yyleng; }
+<STRLIT>{newline}                   {printf("Line %d, column %d: unterminated string literal\n", yylineno, yycolumnno - 1); BEGIN 0; yylineno++; yycolumnno = 1; }
+<STRLIT>\\n|\\f|\\r|\\t|\\\"|\\\    {
+                                    if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
+                                        strlit_buffer_alloc_size += 100;
+                                        strlit_buffer = (char *) realloc(strlit_buffer, strlit_buffer_alloc_size);
+                                    }
+                                    strcat(strlit_buffer, yytext);
+                                    strlit_buffer_pos++;
+                                    yycolumnno += yyleng; yycolumnno += yyleng;
+                                    }
+<STRLIT>\"" "*{newline}             {if (flagL && !flagError) printf("STRLIT(\"%s\")\nSEMICOLON\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; BEGIN 0; yylineno++; yycolumnno = 1; }
+<STRLIT>\"                          {if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; BEGIN 0; yycolumnno += yyleng; flagEOF = 1; }
+<STRLIT>\"" "*"//"                  {if (flagL && !flagError) printf("STRLIT(\"%s\")\nSEMICOLON\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
+<STRLIT>\"" "*"/*"                  {if (flagL && !flagError) printf("STRLIT(\"%s\")\nSEMICOLON\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;  }
 <STRLIT>\\.                         {printf("Line %d, column %d: invalid escape sequence (%s)\n", yylineno, yycolumnno, yytext); flagError = 1; yycolumnno += yyleng; }
 <STRLIT>.                           {
-    
-    if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
-        strlit_buffer_alloc_size += 100;
-        strlit_buffer = (char *) realloc(strlit_buffer, strlit_buffer_alloc_size);
-    }
-    strcat(strlit_buffer, yytext);
-    strlit_buffer_pos++;
-    yycolumnno += yyleng; 
-    
-    }
+                                    if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
+                                        strlit_buffer_alloc_size += 100;
+                                        strlit_buffer = (char *) realloc(strlit_buffer, strlit_buffer_alloc_size);
+                                    }
+                                    strcat(strlit_buffer, yytext);
+                                    strlit_buffer_pos++;
+                                    yycolumnno += yyleng; 
+                                    }
 <STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", yylineno, yycolumnno); BEGIN 0; yycolumnno += yyleng; }   
 
-{O}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; }
-{O}\r\n                             {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;  yycolumnno = 1; }
-{O}\n                               {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;  yycolumnno = 1; }
+{O}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
+{O}" "*\r\n                         {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;  yycolumnno = 1; }
+{O}" "*\n                           {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;  yycolumnno = 1; }
+{O}"}"" "*"//"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+{O}"}"" "*"/*"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
-{H}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; }
+{H}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
 {H}\r\n                             {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;  yycolumnno = 1; }
 {H}\n                               {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;  yycolumnno = 1; }
+{H}"}"" "*"//"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+{H}"}"" "*"/*"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 0([0-7]*[89a-zA-Z]+[0-7]*)+         {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
 
-{D}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; }
+{D}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
 {D}\r\n                             {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;  yycolumnno = 1; }
-{D}\n                               {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;  yycolumnno = 1; }         
+{D}\n                               {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++;  yycolumnno = 1; }
+{D}"}"" "*"//"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+{D}"}"" "*"/*"                      {if (flagL) printf("INTLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }         
 
-(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}              {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}              {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\r\n        {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
 ((({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D})\n          {if (flagL) printf("REALLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1; }  
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"//"   {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+(({d}"."{D})|({D}+"."))({exp}{sig}?{D})?|{D}{exp}{sig}?{D}" "*"/*"   {if (flagL) printf("REALLIT(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
-"//"                                {BEGIN SINGLECOMM; yycolumnno += yyleng; }
-"/*"                                {BEGIN DOUBLECOMM; yycolumnno += yyleng; }
 
 <SINGLECOMM>.                       {yycolumnno += yyleng; }
 <SINGLECOMM>{newline}               {BEGIN 0; yylineno++;  yycolumnno = 1; }
@@ -129,10 +161,12 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM>.                       {yycolumnno += yyleng; }
 <DOUBLECOMM>{newline}               {yylineno++;  yycolumnno = 1; }
 <DOUBLECOMM>"*/"                    {BEGIN 0; yycolumnno += yyleng; }
-<DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", yylineno, yycolumnno); BEGIN 0; yycolumnno += yyleng; }
+<DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }
 
 {newline}                           {yylineno++; yycolumnno = 1; }
 .                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
+
+<<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
 
 %%
 
