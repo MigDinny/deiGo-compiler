@@ -16,7 +16,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
     #include <stdio.h>
     #include <stdlib.h>
     int initialLine, initialColumn = 1;
-    int flagL, flagError, flagEOF, strlit_buffer_pos = 0;
+    int flagL, flagError, flagEOF, flagIDSemiColon, strlit_buffer_pos = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
     char *strlit_buffer;
@@ -26,15 +26,16 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 %X SINGLECOMM DOUBLECOMM STRLIT
 %%
 
-" "                                 {yycolumnno += yyleng; }
-"//"                                {BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
-"/*"                                {BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }            
+" "                                 {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } yycolumnno += yyleng; }
+" "*"//"                            {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"/*"                                {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }            
+";"                                 {if (flagL) printf("SEMICOLON\n"); flagEOF = 0; yycolumnno += yyleng; }
 
 .*                                  {flagEOF = 0; REJECT;}
 
 {reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; }
 
-";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; }
+
 ","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; }
 "_"                                 {if (flagL) printf("BLANKID\n"); yycolumnno += yyleng; }
 "="                                 {if (flagL) printf("ASSIGN\n"); yycolumnno += yyleng; }
@@ -94,11 +95,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 "func"                              {if (flagL) printf("FUNC\n"); yycolumnno += yyleng; }
 "os.Args"                           {if (flagL) printf("CMDARGS\n"); yycolumnno += yyleng; }
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
-{id}" "*\r\n                        {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++; yycolumnno = 1; }
-{id}" "*\n                          {if (flagL) printf("ID(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 1, yytext); yylineno++; yycolumnno = 1;}
-{id}" "*"//"                        {if (flagL) printf("ID(%s)\nSEMICOLON\n", yytext); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
-{id}" "*"/*"                        {if (flagL) printf("ID(%s)\nSEMICOLON\n", yytext); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; flagIDSemiColon = 1; }
 
 \"                                  {BEGIN STRLIT; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
@@ -163,7 +160,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM>"*/"                    {BEGIN 0; yycolumnno += yyleng; }
 <DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }
 
-{newline}                           {yylineno++; yycolumnno = 1; }
+{newline}                           {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } yylineno++; yycolumnno = 1; }
 .                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
 
 <<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
