@@ -168,6 +168,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }
 
 {newline}                           {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } yylineno++; yycolumnno = 1; }
+\t                                  {yycolumnno += yyleng;}
 .                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
 
 <<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
