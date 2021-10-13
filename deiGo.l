@@ -9,7 +9,7 @@ exp                                 [eE]
 sig                                 [-+]
 esc                                 (\f|\n|\r|\t|\\|\")* 
 strlit                              ("carriage return"|"newline"|\"\")             
-newline                             \r\n|\n
+newline                             \r\n|\n|\r
 illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 %{
     #include <stdio.h>
@@ -99,10 +99,6 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 \"                                  {flagError = 0; BEGIN STRLIT; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
 
 <STRLIT>(\\)                        {flagEOF_strlit = 1; REJECT;}
-<STRLIT>(\\){newline}               {
-                                    printf("Line %d, column %d: invalid escape sequence (", yylineno, yycolumnno); printf("%.*s)\n", (int) strlen(yytext) - 1, yytext);
-                                    printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn);
-                                    flagError = 1; yycolumnno += yyleng; BEGIN 0; strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; }
 
 
 <STRLIT>{newline}                       {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); BEGIN 0; strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; }
@@ -120,7 +116,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <STRLIT>\"                          {if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; BEGIN 0; yycolumnno += yyleng; flagEOF = 1; flagEOF_strlit = 0; }
 <STRLIT>\"" "*"//"                  {if (flagL && !flagError) printf("STRLIT(\"%s\")\nSEMICOLON\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; flagEOF_strlit = 0; BEGIN SINGLECOMM; yycolumnno += yyleng;}
 <STRLIT>\"" "*"/*"                  {if (flagL && !flagError) printf("STRLIT(\"%s\")\nSEMICOLON\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; flagEOF_strlit = 0; BEGIN DOUBLECOMM; yycolumnno += yyleng;  }
-<STRLIT>\\.                         {printf("Line %d, column %d: invalid escape sequence (%s)\n", yylineno, yycolumnno, yytext); flagError = 1; yycolumnno += yyleng; }
+<STRLIT>\\[^\n\r]?                  {printf("Line %d, column %d: invalid escape sequence (%s)\n", yylineno, yycolumnno, yytext); flagError = 1; yycolumnno += yyleng; }
 <STRLIT>.                           {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;
@@ -130,7 +126,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
                                     strlit_buffer_pos++;
                                     yycolumnno += yyleng; 
                                     }
-<STRLIT><<EOF>>                     {if (flagEOF_strlit == 1) printf("Line %d, column %d: invalid escape sequence (\\)\n", yylineno, yycolumnno-1); printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }   
+<STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }   
 
 {O}                                 {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; }
 {O}" "*\r\n                         {if (flagL) printf("INTLIT(%.*s)\nSEMICOLON\n", (int) strlen(yytext) - 2, yytext); yylineno++;  yycolumnno = 1; }
