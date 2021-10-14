@@ -1,14 +1,5 @@
 ## META 1
 
-- [ ] str_bad_1 -> 
-
-```
-6c6
-< Line 4, column 8: invalid escape sequence (\)
----
-) Line 4, column 8: invalid escape sequence (\
-```
-
 **SUBMISSÕES**
 
 - [ ] F Comments 10/15
