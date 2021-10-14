@@ -25,9 +25,9 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 %X SINGLECOMM DOUBLECOMM STRLIT
 %%
 
-" "                                 {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } yycolumnno += yyleng; }
-" "*"//"                            {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
-"/*"                                {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }            
+" "                                 {if (flagEOF == 1 && flagL) { flagEOF = 0; printf("SEMICOLON\n"); } yycolumnno += yyleng; }
+" "*"//"                            {if (flagEOF == 1 && flagL) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }
+"/*"                                {if (flagEOF == 1 && flagL) { flagEOF = 0; printf("SEMICOLON\n"); } BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; }            
 ";"                                 {if (flagL) printf("SEMICOLON\n"); flagEOF = 0; yycolumnno += yyleng; }
 
 .*                                  {flagEOF = 0; REJECT;}
@@ -163,7 +163,7 @@ illegal_character                   [^a-zA-Z0-9;,._=*<>!%&|\"-\"+{}()[\]\\]
 <DOUBLECOMM>"*/"                    {BEGIN 0; yycolumnno += yyleng; }
 <DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); BEGIN 0; yycolumnno += yyleng; }
 
-{newline}                           {if (flagEOF == 1) { flagEOF = 0; printf("SEMICOLON\n"); } yylineno++; yycolumnno = 1; }
+{newline}                           {if (flagEOF == 1 && flagL) { flagEOF = 0; printf("SEMICOLON\n"); } yylineno++; yycolumnno = 1; }
 \t                                  {yycolumnno += yyleng;}
 .                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
 
