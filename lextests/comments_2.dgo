@@ -9,7 +9,7 @@ func //factorial(n int) int {
 
 /*
     * COMENTARIO
-    _ 
+    _ @££@£@||"\\\! /*ola ola ines brasiu
     int
     IGNORAR
 */
@@ -18,4 +18,4 @@ func /*main()*/ {
     var /*argument int;
     argument,_ =*/ strconv.Atoi(os.Args[1]);
     fmt.Println(factorial(argument));
-}; // IGNORAR (= 1982uoij
+};// IGNORAR (= 1982uoij
