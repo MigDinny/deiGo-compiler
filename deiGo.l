@@ -91,7 +91,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 {int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
 {real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
 
-0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
+0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
@@ -111,7 +111,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
 {newline}                           {if (flagEOF == 1 && flagL && !flagError) printf("SEMICOLON\n"); yylineno++; yycolumnno = 1; flagEOF = 0;}
 \t                                  {yycolumnno += yyleng;}
-.                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; }
+.                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
 
 <<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
 
