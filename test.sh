@@ -17,7 +17,7 @@ do
    A=${ef//\.dgo/.out_temp}
    B=${ef//\.dgo/.out}
    ./gocompiler -l < $ef > $A
-   diff $A $B
+   colordiff --strip-trailing-cr $A $B
    if test ! -z $1 && test $1 = "-c"; then
       rm -Rf $A
    fi
