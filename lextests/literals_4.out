@@ -1,0 +1,17 @@
+STRLIT("hello world")
+SEMICOLON
+STRLIT("123")
+SEMICOLON
+STRLIT("teste")
+STRLIT("teste")
+STRLIT("teste")
+STRLIT("")
+SEMICOLON
+STRLIT("\"\"teste\"teste\"teste\"\"")
+SEMICOLON
+STRLIT("\fhello\nworld\rhow\tare\\you")
+SEMICOLON
+STRLIT("\\\\\\\"\\")
+STRLIT("\"")
+STRLIT("1h2e3l4l5o6\\")
+SEMICOLON
