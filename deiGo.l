@@ -93,7 +93,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
 0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
 
-\"                                  {BEGIN STRLIT; flagError = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
+\"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
 <STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; flagEOF = 1;}
 <STRLIT>[^\\]|{escape_sequence}     {
