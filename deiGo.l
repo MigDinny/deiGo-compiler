@@ -35,8 +35,8 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 %%
 
 " "                                 {yycolumnno += yyleng;}
-" "*"//"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0;}
-" "*"/*"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0;}            
+" "*"//"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;  flagEOF = 0;}
+" "*"/*"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;  flagEOF = 0;}            
 ";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; flagEOF = 0;}
 
 <SINGLECOMM>.                       {yycolumnno += yyleng;}
