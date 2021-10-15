@@ -35,16 +35,16 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 %%
 
 " "                                 {yycolumnno += yyleng;}
-" "*"//"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN SINGLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;  flagEOF = 0;}
-" "*"/*"                            {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); BEGIN DOUBLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;  flagEOF = 0;}            
+" "*"//"                            { BEGIN SINGLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;}
+" "*"/*"                            { BEGIN DOUBLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;}            
 ";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; flagEOF = 0;}
 
 <SINGLECOMM>.                       {yycolumnno += yyleng;}
-<SINGLECOMM>{newline}               {BEGIN 0; yylineno++;  yycolumnno = 1;}
+<SINGLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} BEGIN 0; yylineno++;  yycolumnno = 1;}
 
-<DOUBLECOMM><<EOF>>                 {printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); yyterminate();}
+<DOUBLECOMM><<EOF>>                 {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); yyterminate();}
 <DOUBLECOMM>"*/"                    {yycolumnno += yyleng; BEGIN 0;}
-<DOUBLECOMM>{newline}               {yylineno++; yycolumnno = 1;}
+<DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} yylineno++; yycolumnno = 1;}
 <DOUBLECOMM>.                       {yycolumnno += yyleng;}
 
 {reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0;}
