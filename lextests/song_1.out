@@ -1,0 +1,80 @@
+STRLIT(" ")
+ID(you)
+ID(wanna)
+Line 1, column 13: illegal character (?)
+STRLIT("you wanna?")
+SEMICOLON
+Line 4, column 1: illegal character (\)
+Line 4, column 2: illegal character (\)
+Line 4, column 3: illegal character (\)
+Line 4, column 4: illegal character (?)
+Line 4, column 5: illegal character (?)
+Line 4, column 20: invalid escape sequence (\*)
+Line 4, column 26: invalid escape sequence (\*)
+Line 4, column 6: unterminated string literal
+Line 5, column 6: invalid escape sequence (\w)
+Line 5, column 8: invalid escape sequence (\a)
+Line 5, column 15: invalid escape sequence (\a)
+Line 5, column 20: invalid escape sequence (\B)
+STRLIT("\\n \nYou want a Maserati? You 21313")
+ID(a231)
+ID(better)
+ID(work)
+STRLIT(", /* st..ude;nt")
+SEMICOLON
+ID(You)
+ID(want)
+OR
+ID(a)
+ID(Lamborgh)
+NOT
+ID(n)
+NOT
+Line 7, column 25: illegal character (?)
+Line 7, column 26: illegal character (|)
+ID(Sippin)
+Line 7, column 34: illegal character (')
+STRLIT("")
+SEMICOLON
+ID(Look)
+ID(hot)
+ID(in)
+ID(a)
+ID(bikini)
+Line 8, column 21: illegal character (?)
+ID(You)
+ID(better)
+ID(work)
+COMMA
+LT
+SEMICOLON
+ID(student)
+Line 8, column 49: unterminated string literal
+SEMICOLON
+Line 9, column 2: unterminated string literal
+STRLIT("")
+STRLIT("")
+Line 10, column 9: unterminated string literal
+LT
+LT
+LT
+STRLIT("")
+SEMICOLON
+ID(Y)
+STRLIT("ou wanna live fa")
+ID(ncy)
+Line 13, column 23: illegal character (?)
+ID(Live)
+ID(in)
+ID(a)
+SEMICOLON
+ID(Party)
+ID(in)
+ID(France)
+Line 14, column 16: illegal character (?)
+ID(better)
+ID(work)
+COMMA
+ID(b)
+SEMICOLON
+Line 15, column 22: unterminated comment

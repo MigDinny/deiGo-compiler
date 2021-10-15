@@ -1,0 +1,71 @@
+ID(M)
+STRLIT("Y")
+ID(loneli)
+SEMICOLON
+ID(ness)
+ID(is)
+ID(killing)
+ID(me)
+LPAR
+ID(and)
+ID(I)
+RPAR
+Line 1, column 39: unterminated string literal
+SEMICOLON
+ID(I)
+ID(must)
+ID(confess)
+COMMA
+ID(I)
+SEMICOLON
+ID(still)
+ID(believe)
+LPAR
+ID(still)
+ID(believe)
+RPAR
+ID(___23c)
+SEMICOLON
+Line 3, column 1: illegal character (\)
+Line 3, column 2: illegal character (\)
+ID(When)
+Line 3, column 8: illegal character (\)
+Line 3, column 9: illegal character (\)
+STAR
+SEMICOLON
+RPAR
+SEMICOLON
+STRLIT("__021ax__;")
+SEMICOLON
+ID(fubc)
+COMMA
+COMMA
+COMMA
+ID(ola)
+LBRACE
+REALLIT(23.1)
+SEMICOLON
+RBRACE
+LBRACE
+RBRACE
+SEMICOLON
+LBRACE
+STAR
+LPAR
+RPAR
+DIV
+RBRACE
+STRLIT("ola ola")
+SEMICOLON
+ID(codigo)
+FUNC
+LPAR
+RPAR
+LBRACE
+RBRACE
+FUNC
+ID(codigo)
+LPAR
+RPAR
+SEMICOLON
+Line 21, column 1: unterminated string literal

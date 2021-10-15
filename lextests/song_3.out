@@ -1,0 +1,102 @@
+ID(Oops)
+COMMA
+STRLIT("              #")
+SEMICOLON
+ID(I)
+ID(did)
+STRLIT("")
+STRLIT("")
+STRLIT("it a")
+ID(gain)
+STRLIT("")
+SEMICOLON
+ID(I)
+ID(playedaw)
+STRLIT("")
+STRLIT("")
+STRLIT("")
+STRLIT("")
+ID(dwda)
+STRLIT(" with your heart")
+STRLIT("")
+ID(d)
+LT
+ID(w)
+LT
+ID(dw)
+COMMA
+COMMA
+STRLIT("")
+ID(got)
+ID(lost)
+ID(in)
+ID(the)
+ID(game)
+SEMICOLON
+ID(Oh)
+ID(b)
+Line 3, column 5: illegal character (#)
+Line 3, column 6: illegal character (#)
+STRLIT("")
+ID(aby)
+COMMA
+INTLIT(212)
+STRLIT("")
+STRLIT("")
+MINUS
+REALLIT(.132)
+STRLIT("")
+STRLIT("")
+STRLIT("")
+Line 3, column 32: unterminated string literal
+ID(Oops)
+COMMA
+ID(you)
+ID(thi)
+Line 4, column 14: illegal character (\)
+Line 4, column 15: illegal character (\)
+Line 4, column 16: illegal character (\)
+Line 4, column 17: illegal character (\)
+STRLIT("")
+Line 4, column 20: unterminated string literal
+ID(That)
+ID(I)
+Line 5, column 7: illegal character (')
+STRLIT("")
+STRLIT("")
+STRLIT("dawdwa")
+STRLIT("")
+Line 5, column 22: unterminated string literal
+ID(I)
+Line 7, column 2: illegal character (')
+Line 7, column 3: illegal character (\)
+STRLIT("\"")
+STRLIT("m not that i")
+NOT
+NOT
+STRLIT("")
+ID(nnocent)
+SEMICOLON
+ID(adwadaw)
+STAR
+DIV
+Line 9, column 25: invalid escape sequence (\b)
+Line 9, column 24: unterminated string literal
+Line 10, column 1: unterminated string literal
+STRLIT("odwaodw")
+STRLIT("")
+ID(dwaidwa)
+STRLIT("")
+ID(dwawad)
+STRLIT("\"")
+Line 12, column 33: illegal character (\)
+Line 12, column 34: illegal character (\)
+Line 12, column 35: illegal character (\)
+STRLIT("")
+STRLIT(" ||\\\"")
+INTLIT(22)
+Line 12, column 49: illegal character (\)
+Line 12, column 50: illegal character (\)
+STRLIT("")
+INTLIT(2)
+Line 12, column 54: unterminated string literal
