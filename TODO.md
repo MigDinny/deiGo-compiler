@@ -2,7 +2,6 @@
 
 **SUBMISSÕES**
 
-- [ ] F Comments 10/15
 - [ ] J Invalid or unterminated string literals 0/20
 
 ## META 2
