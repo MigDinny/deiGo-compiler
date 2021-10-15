@@ -106,12 +106,12 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
                                     yycolumnno += yyleng; 
                                     }
 <STRLIT>\\[^\n\r]?                  {printf("Line %d, column %d: invalid escape sequence (%s)\n", yylineno, yycolumnno, yytext); flagError = 1; yycolumnno += yyleng; }
-<STRLIT>{newline}                   {BEGIN 0; printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; }
-<STRLIT><<EOF>>                     {BEGIN 0; printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); yycolumnno += yyleng;}   
+<STRLIT>{newline}                   {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; BEGIN 0; }
+<STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); yyterminate();}   
 
 {newline}                           {if (flagEOF == 1 && flagL && !flagError) printf("SEMICOLON\n"); yylineno++; yycolumnno = 1; flagEOF = 0;}
 \t                                  {yycolumnno += yyleng;}
-.                                   {printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
+.                                   {flagEOF = 0; printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
 
 <<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
 
