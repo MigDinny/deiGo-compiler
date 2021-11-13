@@ -47,7 +47,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 <DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} yylineno++; yycolumnno = 1;}
 <DOUBLECOMM>.                       {yycolumnno += yyleng;}
 
-{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0; return RESERVED;}
+{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0; yylval.letters = strdup(yytext); return RESERVED;}
 ","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; flagEOF = 0; return COMMA;}
 "_"                                 {if (flagL) printf("BLANKID\n"); yycolumnno += yyleng; flagEOF = 0; return BLANKID;}
 "="                                 {if (flagL) printf("ASSIGN\n"); yycolumnno += yyleng; flagEOF = 0; return ASSIGN;}
@@ -87,15 +87,15 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 "]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; return RSQ;}
 "return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; return RETURN;}
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return ID;}
-{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return INTLIT;}
-{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return REALLIT;}
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); return ID;}
+{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); return INTLIT;}
+{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); return REALLIT;}
 
 0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
-<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; return STRLIT;}
+<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; yylval.letters = strdup(strlit_buffer); return STRLIT;}
 <STRLIT>[^\\\n\r]|{escape_sequence}     {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;

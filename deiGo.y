@@ -13,13 +13,12 @@ node* myprogram; // root node
 %}
 
 %union {
-    char *id;
+    char *letters;
     node_t *node;
 }
 
-%token INTEGER DOUBLE CHARACTER LET IN END WRITE UNARY
 %token COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
-%token <id> ID RESERVED INTLIT REALLIT STRLIT
+%token <letters> ID RESERVED INTLIT REALLIT STRLIT
 
 %left COMMA
 %right ASSIGN 
@@ -58,6 +57,7 @@ Declarations:   /* empty */                        {;}
         | VarDeclaration SEMICOLON Declarations    {;}
         | FuncDeclaration SEMICOLON Declarations   {;}
         ;
+
 
 
 VarDeclaration: VAR VarSpec                     {;}
