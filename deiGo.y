@@ -33,62 +33,85 @@ node* myprogram; // root node
 %nonassoc UNARY
 %nonassoc LPAR RPAR
 
+
 %type <node> Program
-%type <node> vardeclist
-%type <node> vardec
-%type <node> statementlist
-%type <node> statement
+%type <node> Declarations
+%type <node> VarDeclaration
+%type <node> VarSpec
+%type <node> Type
+%type <node> FuncDeclaration
+%type <node> Parameters
+%type <node> FuncBody
+%type <node> VarsAndStatements
+%type <node> Statement
+%type <node> ParseArgs
+%type <node> FuncInvocation
+%type <node> Expr
 
 
 %%
 
-/*
-Program −→ PACKAGE ID SEMICOLON Declarations
-Declarations −→ {VarDeclaration SEMICOLON | FuncDeclaration SEMICOLON}
-VarDeclaration −→ VAR VarSpec
-VarDeclaration −→ VAR LPAR VarSpec SEMICOLON RPAR
-VarSpec −→ ID {COMMA ID} Type
-Type −→ INT | FLOAT32 | BOOL | STRING
-FuncDeclaration −→ FUNC ID LPAR [Parameters] RPAR [Type] FuncBody
-Parameters −→ ID Type {COMMA ID Type}
-FuncBody −→ LBRACE VarsAndStatements RBRACE
-VarsAndStatements −→ VarsAndStatements [VarDeclaration | Statement] SEMICOLON | 
-Statement −→ ID ASSIGN Expr
-Statement −→ LBRACE {Statement SEMICOLON} RBRACE
-Statement −→ IF Expr LBRACE {Statement SEMICOLON} RBRACE [ELSE LBRACE {Statement
-SEMICOLON} RBRACE]
-Statement −→ FOR [Expr] LBRACE {Statement SEMICOLON} RBRACE
-Statement −→ RETURN [Expr]
-Statement −→ FuncInvocation | ParseArgs
-Statement −→ PRINT LPAR (Expr | STRLIT) RPAR
-ParseArgs −→ ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR
-FuncInvocation −→ ID LPAR [Expr {COMMA Expr}] RPAR
-Expr −→ Expr (OR | AND) Expr
-Expr −→ Expr (LT | GT | EQ | NE | LE | GE) Expr
-Expr −→ Expr (PLUS | MINUS | STAR | DIV | MOD) Expr
-Expr −→ (NOT | MINUS | PLUS) Expr
-Expr −→ INTLIT | REALLIT | ID | FuncInvocation | LPAR Expr RPAR
-*/
+Program: PACKAGE ID SEMICOLON Declarations      {;}
+        ;
 
-program: LET vardeclist IN statementlist END
-                                        {$$=myprogram=insert_program($2, $4);} 
-    ;
+Declarations:   /* empty */                        {;}
+        | VarDeclaration SEMICOLON Declarations    {;}
+        | FuncDeclaration SEMICOLON Declarations   {;}
+        ;
 
-vardeclist: /*empty*/                   {$$=NULL;}
-    | vardeclist vardec                 {$$=insert_vardec_list($1, $2);}
-    ;
 
-vardec: INTEGER IDENTIFIER              {$$=insert_integer_dec($2);}
-    | CHARACTER IDENTIFIER              {$$=insert_character_dec($2);}
-    | DOUBLE IDENTIFIER                 {$$=insert_double_dec($2);}
-    ;
+VarDeclaration: VAR VarSpec                     {;}
+        | VAR LPAR VarSpec SEMICOLON RPAR       {;}
+        ;
 
-statementlist: /*empty*/                {$$=NULL;}
-    | statementlist statement           {$$=insert_statement_list($1, $2);}
-    ;
+VarSpec: ID { COMMA ID } Type                   {;}
+        ;
 
-statement: WRITE IDENTIFIER             {$$=insert_write_statement($2);}
-    ;
+Type:   INT                                     {;}
+        | FLOAT32                               {;}
+        | BOOL                                  {;}
+        | STRING                                {;}
+        ;
+
+
+FuncDeclaration: FUNC ID LPAR [Parameters] RPAR [Type] FuncBody {;}
+        ;
+
+
+Parameters: ID Type {COMMA ID Type}                             {;}
+        ;
+
+
+FuncBody: LBRACE VarsAndStatements RBRACE           {;}
+        ;
+
+
+VarsAndStatements: VarsAndStatements [VarDeclaration | Statement] SEMICOLON | VAZIO     {;}
+        ;
+    
+Statement: ID ASSIGN Expr   {;}
+        | LBRACE {Statement SEMICOLON} RBRACE   {;}
+        | IF Expr LBRACE {Statement SEMICOLON} RBRACE [ELSE LBRACE {Statement SEMICOLON} RBRACE]        {;}
+        | FOR [Expr] LBRACE {Statement SEMICOLON} RBRACE        {;}
+        | RETURN [Expr]     {;}
+        | FuncInvocation | ParseArgs        {;}
+        | PRINT LPAR (Expr | STRLIT) RPAR       {;}
+        ;
+
+ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR      {;}
+        ;
+
+FuncInvocation: ID LPAR [Expr {COMMA Expr}] RPAR                                {;}
+        ;
+
+Expr: Expr (OR | AND) Expr                                                      {;}
+        | Expr (LT | GT | EQ | NE | LE | GE) Expr                               {;}
+        | Expr (PLUS | MINUS | STAR | DIV | MOD) Expr                           {;}
+        | (NOT | MINUS | PLUS) Expr                                             {;}
+        ;
+
+Expr: INTLIT | REALLIT | ID | FuncInvocation | LPAR Expr RPAR                 {;}
+        ;
 
 %%
 
