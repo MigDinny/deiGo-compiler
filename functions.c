@@ -4,151 +4,62 @@
 #include <string.h>
 #include <stdio.h>
 
-is_program* insert_program(is_vardec_list* ivl, is_statement_list* isl)
-{
-	is_program* ip=(is_program*)malloc(sizeof(is_program));
+node_t* create_node(char* symbol, int line, int column) {
 
-	ip->vlist=ivl;
-	ip->slist=isl;
+	node_t *n = (node_t*) malloc(sizeof(node_t));
+	token_t *t = (token_t*) malloc(sizeof(token_t));
 
-	return ip;
-}
-
-is_vardec_list* insert_vardec_list(is_vardec_list* head, is_vardec* iv)
-{
-        is_vardec_list* ivl=(is_vardec_list*)malloc(sizeof(is_vardec_list));
-        is_vardec_list* tmp;
-
-        ivl->val=iv;
-        ivl->next=NULL;
-
-        if(head==NULL)
-                return ivl;
-
-        for(tmp=head; tmp->next; tmp=tmp->next);
-        tmp->next=ivl;
-
-        return head;
-}
-
-is_vardec* insert_integer_dec(char* id)
-{
-	is_vardec* iv=(is_vardec*)malloc(sizeof(is_vardec));
-	is_integer_dec* iid=(is_integer_dec*)malloc(sizeof(is_integer_dec));
+	t->symbol = symbol;
+	//n->type = type;
+	n->children = NULL;
+	n->next 	= NULL;
+	n->token = t;
+	n->literal = 0;
 	
-	iid->id=(char*)strdup(id);  /* Por precaucao. Seria apenas necessario copiar o ponteiro, pois o strdup ja foi feito atras*/
-	iv->disc_d=d_integer;
-	iv->data_vardec.u_integer_dec=iid;
-	
-	//printf("Inserted a new integer var: %s\n", iv->data_vardec.u_integer_dec->id); 
-
-	return iv;
+	return n;
 }
 
-is_vardec* insert_character_dec(char* id)
-{
-        is_vardec* iv=(is_vardec*)malloc(sizeof(is_vardec));
-        is_character_dec* icd=(is_character_dec*)malloc(sizeof(is_character_dec));
+node_t* create_literal_node(char *symbol, char *value, int line, int column) {
 
-        icd->id=(char*)strdup(id);  /* Por precaucao. Seria apenas necessario copiar o ponteiro, pois o strdup ja foi feito atras*/
-        iv->disc_d=d_character;
-        iv->data_vardec.u_character_dec=icd;
+	node_t *n = (node_t*) malloc(sizeof(node_t));
+	token_t *t = (token_t*) malloc(sizeof(token_t));
 
-	//printf("Inserted a new char var: %s\n", iv->data_vardec.u_character_dec->id);
+	t->symbol = symbol;
+	t->value  = value;
 
-        return iv;
+	//n->type = type;
+	n->children = NULL;
+	n->next 	= NULL;
+	n->token = t;
+	n->literal = 1;
+
+	return n;
 }
 
-is_vardec* insert_double_dec(char* id)
-{
-        is_vardec* iv=(is_vardec*)malloc(sizeof(is_vardec));
-        is_double_dec* idd=(is_double_dec*)malloc(sizeof(is_double_dec));
+void add_child(node_t *father, node_t *child) {
 
-        idd->id=(char*)strdup(id);  /* Por precaucao. Seria apenas necessario copiar o ponteiro, pois o strdup ja foi feito atras*/
-        iv->disc_d=d_double;
-        iv->data_vardec.u_double_dec=idd;
-
-	//printf("Inserted a new double var: %s\n", iv->data_vardec.u_double_dec->id);
-
-        return iv;
-}
-
-
-is_statement_list* insert_statement_list(is_statement_list* head, is_statement* is)
-{
-	is_statement_list* isl=(is_statement_list*)malloc(sizeof(is_statement_list));
-	is_statement_list* tmp;	
-
-	isl->val=is;
-	isl->next=NULL;
-
-	if(head==NULL)
-		return isl;
-
-	for(tmp=head; tmp->next; tmp=tmp->next);
-	tmp->next=isl;
-
-	return head;
-}
-
-is_statement* insert_write_statement(char* id)
-{
-	is_statement* is=(is_statement*)malloc(sizeof(is_statement));
-	is_write_statement* iws=(is_write_statement*)malloc(sizeof(is_write_statement));
-
-	iws->id=(char*)strdup(id);
-	is->disc_d=d_write;
-	is->data_statement.u_write_statement=iws;
-
-	return is;
-	
-}
-
-void print_program(is_program * ip) {
-
-	printf("Program\n");
-
-	print_vardec_list(ip->vlist);
-
-	print_statement_list(ip->slist);
-
-}
-
-void print_vardec_list(is_vardec_list * ivl) {
-
-	printf(" Vardeclist\n");
-
-	is_vardec_list* aux = ivl;
-
-	for (; aux != NULL; aux = aux->next) print_vardec(aux->val);
-
-}
-
-void print_vardec(is_vardec* iv) {
-	
-	switch (iv->disc_d) {
-		case d_integer:
-			printf("  VardecInteger(%s)\n", iv->data_vardec.u_integer_dec->id);
-			break;
-		case d_character:
-			printf("  VardecCharacter(%s)\n", iv->data_vardec.u_character_dec->id);
-			break;
-		case d_double:
-			printf("  VardecDouble(%s)\n", iv->data_vardec.u_double_dec->id);
-			break;
+	if (father->children == NULL) {
+		// create the first child
+		father->children = child;
+	} else {
+		// append to the child list
+		node_t *last_child = father->children;
+		for (; last_child->next != NULL; last_child = last_child->next);
+		last_child->next = child;
 	}
 
 }
 
-void print_statement_list(is_statement_list* isl) {
-	printf(" Statementlist\n");
-	is_statement_list *aux = isl;
+void print_tree(node_t *root, int init_depth) {
 
-	for (; aux != NULL; aux = aux->next) {
-		print_statement(aux->val);
-	}
-}
+	int depth = init_depth;
 
-void print_statement(is_statement* is) {
-	printf("  StatementWrite(%s)\n", is->data_statement.u_write_statement->id);
+	for (int i = 0; i < depth; i++) printf("..");
+
+	if (root->literal == 0) printf("%s\n", root->token->symbol);
+	else printf("%s(%s)\n", root->token->symbol, root->token->value);
+
+	if (root->children != NULL) print_tree(root->children, depth+1);
+	if (root->next != NULL) 	print_tree(root->next, depth);
+
 }
