@@ -6,12 +6,12 @@ Questions:
 
 Todo:
 
-[ ] - create propper grammar based on given pseudo-grammar
-[ ] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
-[ ] - alter grammar so it is functional based on given requirements (page 7)
-[ ] - sort the associativities (%left, %right, %nonassoc ...)
+M [ ] - create propper grammar based on given pseudo-grammar
+A [ ] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
+AM [ ] - alter grammar so it is functional based on given requirements (page 7)
+A [ ] - sort the associativities (%left, %right, %nonassoc ...)
 [x] - create structs and functions to handle AST
-[ ] - call create_node() and add_child() accordingly, in each grammar production
+M [ ] - call create_node() and add_child() accordingly, in each grammar production
 [ ] - handle redundancy (page 9)
 
 [ ] - error handling + lines and columns + final adjustments of the output
