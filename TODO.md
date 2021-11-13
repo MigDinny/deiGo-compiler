@@ -7,7 +7,7 @@ Questions:
 Todo:
 
 M [ ] - create propper grammar based on given pseudo-grammar
-A [ ] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
+A [x] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
 AM [ ] - alter grammar so it is functional based on given requirements (page 7)
 A [ ] - sort the associativities (%left, %right, %nonassoc ...)
 [x] - create structs and functions to handle AST
