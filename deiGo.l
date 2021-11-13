@@ -47,55 +47,55 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 <DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} yylineno++; yycolumnno = 1;}
 <DOUBLECOMM>.                       {yycolumnno += yyleng;}
 
-{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0;}
-","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; flagEOF = 0;}
-"_"                                 {if (flagL) printf("BLANKID\n"); yycolumnno += yyleng; flagEOF = 0;}
-"="                                 {if (flagL) printf("ASSIGN\n"); yycolumnno += yyleng; flagEOF = 0;}
-"*"                                 {if (flagL) printf("STAR\n"); yycolumnno += yyleng; flagEOF = 0;}
-"/"                                 {if (flagL) printf("DIV\n"); yycolumnno += yyleng; flagEOF = 0;}
-"-"                                 {if (flagL) printf("MINUS\n"); yycolumnno += yyleng; flagEOF = 0;}
-"+"                                 {if (flagL) printf("PLUS\n"); yycolumnno += yyleng; flagEOF = 0;}
-"=="                                {if (flagL) printf("EQ\n"); yycolumnno += yyleng; flagEOF = 0;}
-">="                                {if (flagL) printf("GE\n"); yycolumnno += yyleng; flagEOF = 0;}
-">"                                 {if (flagL) printf("GT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"{"                                 {if (flagL) printf("LBRACE\n"); yycolumnno += yyleng; flagEOF = 0;}
-"<="                                {if (flagL) printf("LE\n"); yycolumnno += yyleng; flagEOF = 0;}
-"("                                 {if (flagL) printf("LPAR\n"); yycolumnno += yyleng; flagEOF = 0;}
-"["                                 {if (flagL) printf("LSQ\n"); yycolumnno += yyleng; flagEOF = 0;}
-"<"                                 {if (flagL) printf("LT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"%"                                 {if (flagL) printf("MOD\n"); yycolumnno += yyleng; flagEOF = 0;}
-"!="                                {if (flagL) printf("NE\n"); yycolumnno += yyleng; flagEOF = 0;}
-"!"                                 {if (flagL) printf("NOT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"&&"                                {if (flagL) printf("AND\n"); yycolumnno += yyleng; flagEOF = 0;}
-"||"                                {if (flagL) printf("OR\n"); yycolumnno += yyleng; flagEOF = 0;}
-"package"                           {if (flagL) printf("PACKAGE\n"); yycolumnno += yyleng; flagEOF = 0;}
-"else"                              {if (flagL) printf("ELSE\n"); yycolumnno += yyleng; flagEOF = 0;}
-"for"                               {if (flagL) printf("FOR\n"); yycolumnno += yyleng; flagEOF = 0;}
-"if"                                {if (flagL) printf("IF\n"); yycolumnno += yyleng; flagEOF = 0;}
-"var"                               {if (flagL) printf("VAR\n"); yycolumnno += yyleng; flagEOF = 0;}
-"int"                               {if (flagL) printf("INT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"float32"                           {if (flagL) printf("FLOAT32\n"); yycolumnno += yyleng; flagEOF = 0;}
-"bool"                              {if (flagL) printf("BOOL\n"); yycolumnno += yyleng; flagEOF = 0;}
-"string"                            {if (flagL) printf("STRING\n"); yycolumnno += yyleng; flagEOF = 0;}
-"fmt.Println"                       {if (flagL) printf("PRINT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"strconv.Atoi"                      {if (flagL) printf("PARSEINT\n"); yycolumnno += yyleng; flagEOF = 0;}
-"func"                              {if (flagL) printf("FUNC\n"); yycolumnno += yyleng; flagEOF = 0;}
-"os.Args"                           {if (flagL) printf("CMDARGS\n"); yycolumnno += yyleng; flagEOF = 0;}
+{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0; return RESERVED;}
+","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; flagEOF = 0; return COMMA;}
+"_"                                 {if (flagL) printf("BLANKID\n"); yycolumnno += yyleng; flagEOF = 0; return BLANKID;}
+"="                                 {if (flagL) printf("ASSIGN\n"); yycolumnno += yyleng; flagEOF = 0; return ASSIGN;}
+"*"                                 {if (flagL) printf("STAR\n"); yycolumnno += yyleng; flagEOF = 0; return STAR;}
+"/"                                 {if (flagL) printf("DIV\n"); yycolumnno += yyleng; flagEOF = 0; return DIV;}
+"-"                                 {if (flagL) printf("MINUS\n"); yycolumnno += yyleng; flagEOF = 0; return MINUS;}
+"+"                                 {if (flagL) printf("PLUS\n"); yycolumnno += yyleng; flagEOF = 0; return PLUS;}
+"=="                                {if (flagL) printf("EQ\n"); yycolumnno += yyleng; flagEOF = 0; return EQ;}
+">="                                {if (flagL) printf("GE\n"); yycolumnno += yyleng; flagEOF = 0; return GE;}
+">"                                 {if (flagL) printf("GT\n"); yycolumnno += yyleng; flagEOF = 0; return GT;}
+"{"                                 {if (flagL) printf("LBRACE\n"); yycolumnno += yyleng; flagEOF = 0; return LBRACE;}
+"<="                                {if (flagL) printf("LE\n"); yycolumnno += yyleng; flagEOF = 0; return LE;}
+"("                                 {if (flagL) printf("LPAR\n"); yycolumnno += yyleng; flagEOF = 0; return LPAR;}
+"["                                 {if (flagL) printf("LSQ\n"); yycolumnno += yyleng; flagEOF = 0; return LSQ;}
+"<"                                 {if (flagL) printf("LT\n"); yycolumnno += yyleng; flagEOF = 0; return LT;}
+"%"                                 {if (flagL) printf("MOD\n"); yycolumnno += yyleng; flagEOF = 0; return MOD;}
+"!="                                {if (flagL) printf("NE\n"); yycolumnno += yyleng; flagEOF = 0; return NE;}
+"!"                                 {if (flagL) printf("NOT\n"); yycolumnno += yyleng; flagEOF = 0; return NOT;}
+"&&"                                {if (flagL) printf("AND\n"); yycolumnno += yyleng; flagEOF = 0; return AND;}
+"||"                                {if (flagL) printf("OR\n"); yycolumnno += yyleng; flagEOF = 0; return OR;}
+"package"                           {if (flagL) printf("PACKAGE\n"); yycolumnno += yyleng; flagEOF = 0; return PACKAGE;}
+"else"                              {if (flagL) printf("ELSE\n"); yycolumnno += yyleng; flagEOF = 0; return ELSE;}
+"for"                               {if (flagL) printf("FOR\n"); yycolumnno += yyleng; flagEOF = 0; return FOR;}
+"if"                                {if (flagL) printf("IF\n"); yycolumnno += yyleng; flagEOF = 0; return IF;}
+"var"                               {if (flagL) printf("VAR\n"); yycolumnno += yyleng; flagEOF = 0; return VAR;}
+"int"                               {if (flagL) printf("INT\n"); yycolumnno += yyleng; flagEOF = 0; return INT;}
+"float32"                           {if (flagL) printf("FLOAT32\n"); yycolumnno += yyleng; flagEOF = 0; return FLOAT32;}
+"bool"                              {if (flagL) printf("BOOL\n"); yycolumnno += yyleng; flagEOF = 0; return BOOL;}
+"string"                            {if (flagL) printf("STRING\n"); yycolumnno += yyleng; flagEOF = 0; return STRING;}
+"fmt.Println"                       {if (flagL) printf("PRINT\n"); yycolumnno += yyleng; flagEOF = 0; return PRINT;}
+"strconv.Atoi"                      {if (flagL) printf("PARSEINT\n"); yycolumnno += yyleng; flagEOF = 0; return PARSEINT;}
+"func"                              {if (flagL) printf("FUNC\n"); yycolumnno += yyleng; flagEOF = 0; return FUNC;}
+"os.Args"                           {if (flagL) printf("CMDARGS\n"); yycolumnno += yyleng; flagEOF = 0; return CMDARGS;}
 
-"}"                                 {if (flagL) printf("RBRACE\n"); yycolumnno += yyleng; flagEOF = 1;}
-")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; flagEOF = 1;}
-"]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1;}
-"return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1;}
+"}"                                 {if (flagL) printf("RBRACE\n"); yycolumnno += yyleng; flagEOF = 1; return RBRACE;}
+")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; flagEOF = 1; return RPAR;}
+"]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; return RSQ;}
+"return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; return RETURN;}
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
-{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
-{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1;}
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return ID;}
+{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return INTLIT;}
+{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; return REALLIT;}
 
 0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
-<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0;}
+<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; return STRLIT;}
 <STRLIT>[^\\\n\r]|{escape_sequence}     {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;
