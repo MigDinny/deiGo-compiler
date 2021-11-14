@@ -74,16 +74,17 @@ Type:   INT                                                                     
         | STRING                                                                                                {;}
         ;
 
-FuncDeclaration: FUNC ID LPAR [Parameters] RPAR [Type] FuncBody {;}
-        | FUNC ID LPAR Parameters RPAR Type FuncBody                                                            {;}
+FuncDeclaration: FUNC ID LPAR Parameters RPAR Type FuncBody                                                     {;}
         | FUNC ID LPAR Parameters RPAR FuncBody                                                                 {;}
         | FUNC ID LPAR RPAR Type FuncBody                                                                       {;}
         | FUNC ID LPAR RPAR FuncBody                                                                            {;}
         ;
 
-Parameters: ID Type Parameters                                                                                  {;}
-        | COMMA ID Type                                                                                         {;}
-        | /* empty */
+Parameters: ID Type Parameters2                                                                                 {;}
+        ;
+
+Parameters2: COMMA ID Type Parameters2                                                                          {;}
+        | /* empty */                                                                                           {;}
         ;
 
 FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {;}
