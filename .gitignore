@@ -7,3 +7,6 @@ out
 compile.sh
 test1
 test
+y.tab.c
+y.tab.h
+deiGo.tab.c
