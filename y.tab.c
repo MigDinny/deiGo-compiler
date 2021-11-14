@@ -72,7 +72,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "structures.h"
 #include "y.tab.h"
+
 
 int yylex (void);
 void yyerror(char* s);
@@ -80,7 +82,8 @@ void yyerror(char* s);
 node_t* myprogram; // root node
 
 
-#line 84 "y.tab.c"
+
+#line 87 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -170,7 +173,7 @@ extern int yydebug;
     RESERVED = 297,
     INTLIT = 298,
     REALLIT = 299,
-    STRLIT = 300,
+    STRLIT2 = 300,
     MUL = 301,
     UNARY = 302
   };
@@ -218,7 +221,7 @@ extern int yydebug;
 #define RESERVED 297
 #define INTLIT 298
 #define REALLIT 299
-#define STRLIT 300
+#define STRLIT2 300
 #define MUL 301
 #define UNARY 302
 
@@ -226,12 +229,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "deiGo.y"
+#line 18 "deiGo.y"
 
     char *letters;
     node_t *node;
 
-#line 235 "y.tab.c"
+#line 238 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -611,13 +614,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    60,    61,    62,    65,    66,    70,    73,
-      74,    77,    78,    79,    80,    83,    84,    85,    86,    89,
-      92,    93,    96,    99,   100,   101,   102,   105,   106,   107,
-     108,   109,   110,   111,   112,   113,   114,   115,   116,   119,
-     120,   123,   126,   127,   130,   131,   134,   135,   136,   137,
-     138,   139,   140,   141,   142,   143,   144,   145,   146,   147,
-     148,   149,   150,   151,   152,   153,   154
+       0,    60,    60,    63,    64,    65,    68,    69,    73,    76,
+      77,    80,    81,    82,    83,    86,    87,    88,    89,    92,
+      95,    96,    99,   102,   103,   104,   105,   108,   109,   110,
+     111,   112,   113,   114,   115,   116,   117,   118,   119,   122,
+     123,   126,   129,   130,   133,   134,   137,   138,   139,   140,
+     141,   142,   143,   144,   145,   146,   147,   148,   149,   150,
+     151,   152,   153,   154,   155,   156,   157
 };
 #endif
 
@@ -631,7 +634,7 @@ static const char *const yytname[] =
   "LE", "LPAR", "LSQ", "LT", "MOD", "NE", "NOT", "AND", "OR", "PACKAGE",
   "ELSE", "FOR", "IF", "VAR", "INT", "FLOAT32", "BOOL", "STRING", "PRINT",
   "PARSEINT", "FUNC", "CMDARGS", "RBRACE", "RPAR", "RSQ", "RETURN", "ID",
-  "RESERVED", "INTLIT", "REALLIT", "STRLIT", "MUL", "UNARY", "$accept",
+  "RESERVED", "INTLIT", "REALLIT", "STRLIT2", "MUL", "UNARY", "$accept",
   "Program", "Declarations", "VarDeclaration", "VarSpec", "VarSpec2",
   "Type", "FuncDeclaration", "Parameters", "Parameters2", "FuncBody",
   "VarsAndStatements", "Statement", "Statement2", "ParseArgs",
@@ -1530,397 +1533,397 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 57 "deiGo.y"
+#line 60 "deiGo.y"
                                                                                                                 {;}
-#line 1536 "y.tab.c"
+#line 1539 "y.tab.c"
     break;
 
   case 3:
-#line 60 "deiGo.y"
+#line 63 "deiGo.y"
                                                                                                                 {;}
-#line 1542 "y.tab.c"
+#line 1545 "y.tab.c"
     break;
 
   case 4:
-#line 61 "deiGo.y"
+#line 64 "deiGo.y"
                                                                                                                 {;}
-#line 1548 "y.tab.c"
+#line 1551 "y.tab.c"
     break;
 
   case 5:
-#line 62 "deiGo.y"
+#line 65 "deiGo.y"
                                                                                                                 {;}
-#line 1554 "y.tab.c"
+#line 1557 "y.tab.c"
     break;
 
   case 6:
-#line 65 "deiGo.y"
+#line 68 "deiGo.y"
                                                                                                                 {;}
-#line 1560 "y.tab.c"
+#line 1563 "y.tab.c"
     break;
 
   case 7:
-#line 66 "deiGo.y"
+#line 69 "deiGo.y"
                                                                                                                 {;}
-#line 1566 "y.tab.c"
+#line 1569 "y.tab.c"
     break;
 
   case 8:
-#line 70 "deiGo.y"
+#line 73 "deiGo.y"
                                                                                                                 {;}
-#line 1572 "y.tab.c"
+#line 1575 "y.tab.c"
     break;
 
   case 9:
-#line 73 "deiGo.y"
+#line 76 "deiGo.y"
                                                                                                                 {;}
-#line 1578 "y.tab.c"
+#line 1581 "y.tab.c"
     break;
 
   case 10:
-#line 74 "deiGo.y"
+#line 77 "deiGo.y"
                                                                                                                 {;}
-#line 1584 "y.tab.c"
+#line 1587 "y.tab.c"
     break;
 
   case 11:
-#line 77 "deiGo.y"
+#line 80 "deiGo.y"
                                                                                                                 {;}
-#line 1590 "y.tab.c"
+#line 1593 "y.tab.c"
     break;
 
   case 12:
-#line 78 "deiGo.y"
+#line 81 "deiGo.y"
                                                                                                                 {;}
-#line 1596 "y.tab.c"
+#line 1599 "y.tab.c"
     break;
 
   case 13:
-#line 79 "deiGo.y"
+#line 82 "deiGo.y"
                                                                                                                 {;}
-#line 1602 "y.tab.c"
+#line 1605 "y.tab.c"
     break;
 
   case 14:
-#line 80 "deiGo.y"
+#line 83 "deiGo.y"
                                                                                                                 {;}
-#line 1608 "y.tab.c"
+#line 1611 "y.tab.c"
     break;
 
   case 15:
-#line 83 "deiGo.y"
+#line 86 "deiGo.y"
                                                                                                                 {;}
-#line 1614 "y.tab.c"
+#line 1617 "y.tab.c"
     break;
 
   case 16:
-#line 84 "deiGo.y"
+#line 87 "deiGo.y"
                                                                                                                 {;}
-#line 1620 "y.tab.c"
+#line 1623 "y.tab.c"
     break;
 
   case 17:
-#line 85 "deiGo.y"
+#line 88 "deiGo.y"
                                                                                                                 {;}
-#line 1626 "y.tab.c"
+#line 1629 "y.tab.c"
     break;
 
   case 18:
-#line 86 "deiGo.y"
+#line 89 "deiGo.y"
                                                                                                                 {;}
-#line 1632 "y.tab.c"
+#line 1635 "y.tab.c"
     break;
 
   case 19:
-#line 89 "deiGo.y"
+#line 92 "deiGo.y"
                                                                                                                 {;}
-#line 1638 "y.tab.c"
+#line 1641 "y.tab.c"
     break;
 
   case 20:
-#line 92 "deiGo.y"
+#line 95 "deiGo.y"
                                                                                                                 {;}
-#line 1644 "y.tab.c"
+#line 1647 "y.tab.c"
     break;
 
   case 21:
-#line 93 "deiGo.y"
+#line 96 "deiGo.y"
                                                                                                                 {;}
-#line 1650 "y.tab.c"
+#line 1653 "y.tab.c"
     break;
 
   case 22:
-#line 96 "deiGo.y"
+#line 99 "deiGo.y"
                                                                                                                 {;}
-#line 1656 "y.tab.c"
+#line 1659 "y.tab.c"
     break;
 
   case 23:
-#line 99 "deiGo.y"
+#line 102 "deiGo.y"
                                                                                                                 {;}
-#line 1662 "y.tab.c"
+#line 1665 "y.tab.c"
     break;
 
   case 24:
-#line 100 "deiGo.y"
+#line 103 "deiGo.y"
                                                                                                                 {;}
-#line 1668 "y.tab.c"
+#line 1671 "y.tab.c"
     break;
 
   case 25:
-#line 101 "deiGo.y"
+#line 104 "deiGo.y"
                                                                                                                 {;}
-#line 1674 "y.tab.c"
+#line 1677 "y.tab.c"
     break;
 
   case 26:
-#line 102 "deiGo.y"
+#line 105 "deiGo.y"
                                                                                                                 {;}
-#line 1680 "y.tab.c"
+#line 1683 "y.tab.c"
     break;
 
   case 27:
-#line 105 "deiGo.y"
+#line 108 "deiGo.y"
                                                                                                                 {;}
-#line 1686 "y.tab.c"
+#line 1689 "y.tab.c"
     break;
 
   case 28:
-#line 106 "deiGo.y"
+#line 109 "deiGo.y"
                                                                                                                 {;}
-#line 1692 "y.tab.c"
+#line 1695 "y.tab.c"
     break;
 
   case 29:
-#line 107 "deiGo.y"
-                                                                                                               {;}
-#line 1698 "y.tab.c"
+#line 110 "deiGo.y"
+                                                                                                                {;}
+#line 1701 "y.tab.c"
     break;
 
   case 30:
-#line 108 "deiGo.y"
-                                                                                                               {;}
-#line 1704 "y.tab.c"
+#line 111 "deiGo.y"
+                                                                                                                {;}
+#line 1707 "y.tab.c"
     break;
 
   case 31:
-#line 109 "deiGo.y"
-                                                                                                               {;}
-#line 1710 "y.tab.c"
+#line 112 "deiGo.y"
+                                                                                                                {;}
+#line 1713 "y.tab.c"
     break;
 
   case 32:
-#line 110 "deiGo.y"
-                                                                                                               {;}
-#line 1716 "y.tab.c"
+#line 113 "deiGo.y"
+                                                                                                                {;}
+#line 1719 "y.tab.c"
     break;
 
   case 33:
-#line 111 "deiGo.y"
+#line 114 "deiGo.y"
                                                                                                                 {;}
-#line 1722 "y.tab.c"
+#line 1725 "y.tab.c"
     break;
 
   case 34:
-#line 112 "deiGo.y"
+#line 115 "deiGo.y"
                                                                                                                 {;}
-#line 1728 "y.tab.c"
+#line 1731 "y.tab.c"
     break;
 
   case 35:
-#line 113 "deiGo.y"
+#line 116 "deiGo.y"
                                                                                                                 {;}
-#line 1734 "y.tab.c"
+#line 1737 "y.tab.c"
     break;
 
   case 36:
-#line 114 "deiGo.y"
+#line 117 "deiGo.y"
                                                                                                                 {;}
-#line 1740 "y.tab.c"
+#line 1743 "y.tab.c"
     break;
 
   case 37:
-#line 115 "deiGo.y"
+#line 118 "deiGo.y"
                                                                                                                 {;}
-#line 1746 "y.tab.c"
+#line 1749 "y.tab.c"
     break;
 
   case 38:
-#line 116 "deiGo.y"
+#line 119 "deiGo.y"
                                                                                                                 {;}
-#line 1752 "y.tab.c"
+#line 1755 "y.tab.c"
     break;
 
   case 39:
-#line 119 "deiGo.y"
+#line 122 "deiGo.y"
                                                                                                                 {;}
-#line 1758 "y.tab.c"
+#line 1761 "y.tab.c"
     break;
 
   case 40:
-#line 120 "deiGo.y"
+#line 123 "deiGo.y"
                                                                                                                 {;}
-#line 1764 "y.tab.c"
+#line 1767 "y.tab.c"
     break;
 
   case 41:
-#line 123 "deiGo.y"
+#line 126 "deiGo.y"
                                                                                                                 {;}
-#line 1770 "y.tab.c"
+#line 1773 "y.tab.c"
     break;
 
   case 42:
-#line 126 "deiGo.y"
+#line 129 "deiGo.y"
                                                                                                                 {;}
-#line 1776 "y.tab.c"
+#line 1779 "y.tab.c"
     break;
 
   case 43:
-#line 127 "deiGo.y"
+#line 130 "deiGo.y"
                                                                                                                 {;}
-#line 1782 "y.tab.c"
+#line 1785 "y.tab.c"
     break;
 
   case 44:
-#line 130 "deiGo.y"
+#line 133 "deiGo.y"
                                                                                                                 {;}
-#line 1788 "y.tab.c"
+#line 1791 "y.tab.c"
     break;
 
   case 45:
-#line 131 "deiGo.y"
+#line 134 "deiGo.y"
                                                                                                                 {;}
-#line 1794 "y.tab.c"
+#line 1797 "y.tab.c"
     break;
 
   case 46:
-#line 134 "deiGo.y"
+#line 137 "deiGo.y"
                                                                                                                 {;}
-#line 1800 "y.tab.c"
+#line 1803 "y.tab.c"
     break;
 
   case 47:
-#line 135 "deiGo.y"
+#line 138 "deiGo.y"
                                                                                                                 {;}
-#line 1806 "y.tab.c"
+#line 1809 "y.tab.c"
     break;
 
   case 48:
-#line 136 "deiGo.y"
+#line 139 "deiGo.y"
                                                                                                                 {;}
-#line 1812 "y.tab.c"
+#line 1815 "y.tab.c"
     break;
 
   case 49:
-#line 137 "deiGo.y"
+#line 140 "deiGo.y"
                                                                                                                 {;}
-#line 1818 "y.tab.c"
+#line 1821 "y.tab.c"
     break;
 
   case 50:
-#line 138 "deiGo.y"
+#line 141 "deiGo.y"
                                                                                                                 {;}
-#line 1824 "y.tab.c"
+#line 1827 "y.tab.c"
     break;
 
   case 51:
-#line 139 "deiGo.y"
+#line 142 "deiGo.y"
                                                                                                                 {;}
-#line 1830 "y.tab.c"
+#line 1833 "y.tab.c"
     break;
 
   case 52:
-#line 140 "deiGo.y"
+#line 143 "deiGo.y"
                                                                                                                 {;}
-#line 1836 "y.tab.c"
+#line 1839 "y.tab.c"
     break;
 
   case 53:
-#line 141 "deiGo.y"
+#line 144 "deiGo.y"
                                                                                                                 {;}
-#line 1842 "y.tab.c"
+#line 1845 "y.tab.c"
     break;
 
   case 54:
-#line 142 "deiGo.y"
+#line 145 "deiGo.y"
                                                                                                                 {;}
-#line 1848 "y.tab.c"
+#line 1851 "y.tab.c"
     break;
 
   case 55:
-#line 143 "deiGo.y"
+#line 146 "deiGo.y"
                                                                                                                 {;}
-#line 1854 "y.tab.c"
+#line 1857 "y.tab.c"
     break;
 
   case 56:
-#line 144 "deiGo.y"
+#line 147 "deiGo.y"
                                                                                                                 {;}
-#line 1860 "y.tab.c"
+#line 1863 "y.tab.c"
     break;
 
   case 57:
-#line 145 "deiGo.y"
+#line 148 "deiGo.y"
                                                                                                                 {;}
-#line 1866 "y.tab.c"
+#line 1869 "y.tab.c"
     break;
 
   case 58:
-#line 146 "deiGo.y"
+#line 149 "deiGo.y"
                                                                                                                 {;}
-#line 1872 "y.tab.c"
+#line 1875 "y.tab.c"
     break;
 
   case 59:
-#line 147 "deiGo.y"
+#line 150 "deiGo.y"
                                                                                                                 {;}
-#line 1878 "y.tab.c"
+#line 1881 "y.tab.c"
     break;
 
   case 60:
-#line 148 "deiGo.y"
+#line 151 "deiGo.y"
                                                                                                                 {;}
-#line 1884 "y.tab.c"
+#line 1887 "y.tab.c"
     break;
 
   case 61:
-#line 149 "deiGo.y"
+#line 152 "deiGo.y"
                                                                                                                 {;}
-#line 1890 "y.tab.c"
+#line 1893 "y.tab.c"
     break;
 
   case 62:
-#line 150 "deiGo.y"
+#line 153 "deiGo.y"
                                                                                                                 {;}
-#line 1896 "y.tab.c"
+#line 1899 "y.tab.c"
     break;
 
   case 63:
-#line 151 "deiGo.y"
+#line 154 "deiGo.y"
                                                                                                                 {;}
-#line 1902 "y.tab.c"
+#line 1905 "y.tab.c"
     break;
 
   case 64:
-#line 152 "deiGo.y"
+#line 155 "deiGo.y"
                                                                                                                 {;}
-#line 1908 "y.tab.c"
+#line 1911 "y.tab.c"
     break;
 
   case 65:
-#line 153 "deiGo.y"
+#line 156 "deiGo.y"
                                                                                                                 {;}
-#line 1914 "y.tab.c"
+#line 1917 "y.tab.c"
     break;
 
   case 66:
-#line 154 "deiGo.y"
+#line 157 "deiGo.y"
                                                                                                                 {;}
-#line 1920 "y.tab.c"
+#line 1923 "y.tab.c"
     break;
 
 
-#line 1924 "y.tab.c"
+#line 1927 "y.tab.c"
 
       default: break;
     }
@@ -2152,10 +2155,9 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 157 "deiGo.y"
+#line 160 "deiGo.y"
 
 
 void yyerror(char *msg) {
     printf("%s", msg);
 }
-

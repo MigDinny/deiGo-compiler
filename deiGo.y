@@ -3,12 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "structures.h"
 #include "y.tab.h"
+
 
 int yylex (void);
 void yyerror(char* s);
 
 node_t* myprogram; // root node
+
 
 %}
 
@@ -18,7 +21,7 @@ node_t* myprogram; // root node
 }
 
 %token SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
-%token <letters> ID RESERVED INTLIT REALLIT STRLIT
+%token <letters> ID RESERVED INTLIT REALLIT STRLIT2
 
 %left COMMA
 %right ASSIGN 
@@ -104,16 +107,16 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
     
 Statement: ID ASSIGN Expr                                                                                       {;}
         | LBRACE Statement2 RBRACE                                                                              {;}
-        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
-        | IF Expr LBRACE Statement2 RBRACE                                                                     {;}
-        | FOR Expr LBRACE Statement2 RBRACE                                                                    {;}
-        | FOR  LBRACE Statement2 RBRACE                                                                        {;}
+        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {;}
+        | IF Expr LBRACE Statement2 RBRACE                                                                      {;}
+        | FOR Expr LBRACE Statement2 RBRACE                                                                     {;}
+        | FOR  LBRACE Statement2 RBRACE                                                                         {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
         | ParseArgs                                                                                             {;}
         | PRINT LPAR Expr RPAR                                                                                  {;}
-        | PRINT LPAR STRLIT RPAR                                                                                {;}
+        | PRINT LPAR STRLIT2 RPAR                                                                               {;}
         ;
 
 Statement2: Statement SEMICOLON Statement2                                                                      {;}
@@ -159,4 +162,3 @@ Expr: Expr OR Expr                                                              
 void yyerror(char *msg) {
     printf("%s", msg);
 }
-

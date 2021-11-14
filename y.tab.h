@@ -91,7 +91,7 @@ extern int yydebug;
     RESERVED = 297,
     INTLIT = 298,
     REALLIT = 299,
-    STRLIT = 300,
+    STRLIT2 = 300,
     MUL = 301,
     UNARY = 302
   };
@@ -139,7 +139,7 @@ extern int yydebug;
 #define RESERVED 297
 #define INTLIT 298
 #define REALLIT 299
-#define STRLIT 300
+#define STRLIT2 300
 #define MUL 301
 #define UNARY 302
 
@@ -147,7 +147,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "deiGo.y"
+#line 18 "deiGo.y"
 
     char *letters;
     node_t *node;
