@@ -7,9 +7,9 @@ Questions:
 Todo:
 
 M [x] - create propper grammar based on given pseudo-grammar
-REVER A [x] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
+A [x] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
 AM [ ] - alter grammar so it is functional based on given requirements (page 7)
-REVER A [x] - sort the associativities (%left, %right, %nonassoc ...)
+A [x] - sort the associativities (%left, %right, %nonassoc ...)
 [x] - create structs and functions to handle AST
 M [ ] - call create_node() and add_child() accordingly, in each grammar production
 [ ] - handle redundancy (page 9)
