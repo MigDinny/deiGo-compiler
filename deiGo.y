@@ -29,7 +29,7 @@ node_t* myprogram; // root node
 %left AND
 %left EQ NE LT LE GT GE     
 %left PLUS MINUS
-%left MUL DIV MOD
+%left STAR DIV MOD
 %right NOT
 
 %nonassoc UNARY
