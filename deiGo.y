@@ -70,6 +70,7 @@ VarSpec: ID VarSpec2 Type                                                       
 
 VarSpec2: COMMA ID                                                                                              {;}
         | /* empty */                                                                                           {;}
+        ;
 
 Type:   INT                                                                                                     {;}
         | FLOAT32                                                                                               {;}
@@ -115,6 +116,7 @@ Statement: ID ASSIGN Expr                                                       
 
 Statement2: Statement SEMICOLON                                                                                 {;}
         | /* empty */                                                                                           {;}
+        ;
 
 ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
         ;
@@ -125,6 +127,7 @@ FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                               
 
 FuncInvocation2: COMMA Expr                                                                                     {;}
         | /* empty */                                                                                           {;}
+        ;
 
 Expr: Expr OR Expr                                                                                              {;}      
         | Expr AND Expr                                                                                         {;}
