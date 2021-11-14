@@ -46,8 +46,10 @@ node* myprogram; // root node
 %type <node> FuncBody
 %type <node> VarsAndStatements
 %type <node> Statement
+%type <node> Statement2
 %type <node> ParseArgs
 %type <node> FuncInvocation
+%type <node> FuncInvocation2
 %type <node> Expr
 
 
@@ -68,7 +70,7 @@ VarDeclaration: VAR VarSpec                                                     
 VarSpec: ID VarSpec2 Type                                                                                       {;}
         ;
 
-VarSpec2: COMMA ID                                                                                              {;}
+VarSpec2: COMMA ID VarSpec2                                                                                     {;}
         | /* empty */                                                                                           {;}
         ;
 
@@ -114,7 +116,7 @@ Statement: ID ASSIGN Expr                                                       
         | PRINT LPAR STRLIT RPAR                                                                                {;}
         ;
 
-Statement2: Statement SEMICOLON                                                                                 {;}
+Statement2: Statement SEMICOLON Statement2                                                                      {;}
         | /* empty */                                                                                           {;}
         ;
 
@@ -125,7 +127,7 @@ FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                               
         | ID LPAR RPAR                                                                                          {;}
         ;
 
-FuncInvocation2: COMMA Expr                                                                                     {;}
+FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
         | /* empty */                                                                                           {;}
         ;
 
