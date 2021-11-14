@@ -3,12 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "structures.h"
 #include "y.tab.h"
+
 
 int yylex (void);
 void yyerror(char* s);
 
-node* myprogram; // root node
+node_t* myprogram; // root node
+
 
 %}
 
@@ -17,8 +20,8 @@ node* myprogram; // root node
     node_t *node;
 }
 
-%token COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
-%token <letters> ID RESERVED INTLIT REALLIT STRLIT
+%token SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
+%token <letters> ID RESERVED INTLIT REALLIT STRLIT2
 
 %left COMMA
 %right ASSIGN 
@@ -26,7 +29,7 @@ node* myprogram; // root node
 %left AND
 %left EQ NE LT LE GT GE     
 %left PLUS MINUS
-%left MUL DIV MOD
+%left STAR DIV MOD
 %right NOT
 
 %nonassoc UNARY
@@ -40,6 +43,7 @@ node* myprogram; // root node
 %type <node> VarSpec2
 %type <node> Type
 %type <node> FuncDeclaration
+%type <node> FuncHeader
 %type <node> Parameters
 %type <node> Parameters2
 %type <node> FuncBody
@@ -105,16 +109,16 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
     
 Statement: ID ASSIGN Expr                                                                                       {;}
         | LBRACE Statement2 RBRACE                                                                              {;}
-        | IF Expr LBRACE Statement 2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
-        | IF Expr LBRACE Statement 2 RBRACE                                                                     {;}
-        | FOR Expr LBRACE Statement 2 RBRACE                                                                    {;}
-        | FOR  LBRACE Statement 2 RBRACE                                                                        {;}
+        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {;}
+        | IF Expr LBRACE Statement2 RBRACE                                                                      {;}
+        | FOR Expr LBRACE Statement2 RBRACE                                                                     {;}
+        | FOR      LBRACE Statement2 RBRACE                                                                         {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
         | ParseArgs                                                                                             {;}
         | PRINT LPAR Expr RPAR                                                                                  {;}
-        | PRINT LPAR STRLIT RPAR                                                                                {;}
+        | PRINT LPAR STRLIT2 RPAR                                                                               {;}
         ;
 
 Statement2: Statement SEMICOLON Statement2                                                                      {;}
@@ -125,7 +129,7 @@ ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR      
         ;
 
 FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                                                               {;}
-        | ID LPAR RPAR                                                                                          {;}
+        |       ID LPAR                      RPAR                                                                                          {;}
         ;
 
 FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
@@ -160,4 +164,3 @@ Expr: Expr OR Expr                                                              
 void yyerror(char *msg) {
     printf("%s", msg);
 }
-

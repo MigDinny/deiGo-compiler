@@ -22,6 +22,10 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include "structures.h"
+    #include "y.tab.h"
+    #include "functions.h"
+    
     int initialLine, initialColumn = 1;
     int flagL, flagError, flagEOF, flagEOF_strlit, strlit_buffer_pos = 0;
     char left_bracket = '(';
@@ -95,7 +99,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
-<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; yylval.letters = strdup(strlit_buffer); return STRLIT;}
+<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; yylval.letters = strdup(strlit_buffer); return STRLIT2;}
 <STRLIT>[^\\\n\r]|{escape_sequence}     {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;
