@@ -50,15 +50,13 @@ node* myprogram; // root node
 
 %%
 
-Program: PACKAGE ID SEMICOLON Declarations      {;}
+Program: PACKAGE ID SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);}
         ;
 
-Declarations:   /* empty */                        {;}
-        | VarDeclaration SEMICOLON Declarations    {;}
-        | FuncDeclaration SEMICOLON Declarations   {;}
+Declarations:   /* empty */                        {$$ = NULL;}
+        | VarDeclaration SEMICOLON Declarations    {$$ = $1; add_next($$, $3);}
+        | FuncDeclaration SEMICOLON Declarations   {$$ = $1; add_next($$, $3);}
         ;
-
-
 
 VarDeclaration: VAR VarSpec                     {;}
         | VAR LPAR VarSpec SEMICOLON RPAR       {;}

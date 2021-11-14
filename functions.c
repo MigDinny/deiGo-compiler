@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-node_t* create_node(char* symbol, int line, int column) {
+node_t* create_node(char* symbol) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
 	token_t *t = (token_t*) malloc(sizeof(token_t));
@@ -48,6 +48,13 @@ void add_child(node_t *father, node_t *child) {
 		last_child->next = child;
 	}
 
+}
+
+void add_next(node_t *node, node_t *next) {
+
+	if (node == NULL || next == NULL) return;
+
+	node->next = next;
 }
 
 void print_tree(node_t *root, int init_depth) {
