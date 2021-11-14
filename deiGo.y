@@ -45,7 +45,7 @@ node_t* myprogram; // root node
 %type <node> FuncDeclaration
 %type <node> FuncHeader
 %type <node> Parameters
-%type <node> Parameters2
+%type <node> ParametersDecl
 %type <node> FuncBody
 %type <node> VarsAndStatements
 %type <node> Statement
@@ -54,6 +54,7 @@ node_t* myprogram; // root node
 %type <node> FuncInvocation
 %type <node> FuncInvocation2
 %type <node> Expr
+%type <node> Id
 
 
 %%
@@ -61,13 +62,13 @@ node_t* myprogram; // root node
 Program: PACKAGE ID SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);}
         ;
 
-Declarations: VarDeclaration SEMICOLON Declarations                                     {$$ = $1; add_next($$, $3);}
-        | FuncDeclaration SEMICOLON Declarations                                        {$$ = $1; add_next($$, $3);}
-        | /* empty */                                                                   {$$ = NULL;}
+Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
+        | FuncDeclaration SEMICOLON Declarations                                                {$$ = $1; add_next($$, $3);}
+        | /* empty */                                                                           {$$ = NULL;}
         ;
 
-VarDeclaration: VAR VarSpec                     {$$ = create_node("VarDecl"); add_child($$, $2);}
-        | VAR LPAR VarSpec SEMICOLON RPAR       {$$ = create_node("VarDecl"); add_child($$, $3);}
+VarDeclaration: VAR VarSpec                                                                     {$$ = create_node("VarDecl"); add_child($$, $2);}
+        | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = create_node("VarDecl"); add_child($$, $3);}
         ;
 
 VarSpec: ID VarSpec2 Type                                                                                       {;}
@@ -83,28 +84,32 @@ Type:   INT                                                                     
         | STRING                                                                                                {;}
         ;
 
-FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); /*add_child($$, $4); add_child($$, $6); add_child($$, $7);*/};
-
-FuncHeader: FUNC ID LPAR Parameters RPAR Type                                   {;}
-        | FUNC ID LPAR Parameters RPAR                                          {;}
-        | FUNC ID LPAR RPAR Type                                                {;}
-        | FUNC ID LPAR RPAR                                                     {;}
+FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); add_child($$, $1); add_child($$, $2);}
         ;
 
-Parameters: ID Type Parameters2                                                                                 {$$ = create_node("FuncParams"); add_child($$, $2); add_child($$, $3);}
+FuncHeader: FUNC ID LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
+        | FUNC ID LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
+        | FUNC ID LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2);  }
+        | FUNC ID LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);  }
         ;
 
-Parameters2: COMMA ID Type Parameters2                                                                          {;}
+Parameters: ID Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); add_child($$, $3); }
+        ;
+
+ParametersDecl: COMMA ID Type ParametersDecl                                                                    {$$ = create_node("ParamDecl"); add_child($$, $3); add_child($$, $2); add_next($$, $4); }
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {;}
+Id:     ID                                                                                                      {$$ = create_literal_node("Id", $1);}
         ;
 
-VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                                                   {;}
-        | VarsAndStatements Statement SEMICOLON                                                                 {;} 
-        | VarsAndStatements SEMICOLON                                                                           {;}
-        | /* epsilon */                                                                                         {;}
+FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {$$ = create_node("FuncBody"); add_child($$, $2); }
+        ;
+
+VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                                                   {$$ = $2; add_next($$, $1);}
+        | VarsAndStatements Statement SEMICOLON                                                                 {$$ = $2; add_next($$, $1);} 
+        | VarsAndStatements SEMICOLON                                                                           {$$ = $1; }
+        | /* epsilon */                                                                                         {$$ = NULL;}
         ;
     
 Statement: ID ASSIGN Expr                                                                                       {;}
