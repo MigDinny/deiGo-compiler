@@ -34,7 +34,7 @@ node_t* create_block_node() {
 	return n;
 }
 
-node_t* create_literal_node(char *symbol, char *value, int line, int column) {
+node_t* create_literal_node(char *symbol, char *value) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
 	token_t *t = (token_t*) malloc(sizeof(token_t));

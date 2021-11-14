@@ -55,7 +55,10 @@ node_t *temp; // temp node to use as an aux
 %type <node> FuncInvocation2
 %type <node> Expr
 %type <node> Id
-
+%type <node> Intlit
+%type <node> Reallit
+%type <node> Strlit2
+%type <node> Assign
 
 %%
 
@@ -100,8 +103,6 @@ ParametersDecl: COMMA Id Type ParametersDecl                                    
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-Id:     ID                                                                                                      {$$ = create_literal_node("Id", $1);}
-        ;
 
 FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {$$ = create_node("FuncBody"); add_child($$, $2); }
         ;
@@ -131,14 +132,14 @@ Statement2: Statement SEMICOLON Statement2                                      
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_next($$, $4); add_next($4, $9);}
+ParseArgs: Id COMMA BLANKID Assign PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_next($$, $4); add_next($4, $9);}
         ;
 
 FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {$$ = $1; add_next($$, $3); add_next($3, $4);}
         |       Id LPAR                      RPAR                                                               {$$ = $1;}
         ;
 
-FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {$$ = $2; add_next($$, $3)}
+FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {$$ = $2; add_next($$, $3);}
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
@@ -168,7 +169,7 @@ Expr: Expr OR Expr                                                              
 
 
 
-        
+
 
 Id:     ID                                                                                                      {$$ = create_literal_node("Id", $1);}
         ;
@@ -182,7 +183,7 @@ Reallit: REALLIT                                                                
 Strlit2: STRLIT2                                                                                                {$$ = create_literal_node("STRLIT", $1);}
         ;
 
-Assign: ASSIGN                                                                                                  {$$ = create_node("Assign", $1);}
+Assign: ASSIGN                                                                                                  {$$ = create_node("Assign");}
         ;
 
 
