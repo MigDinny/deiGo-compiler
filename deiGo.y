@@ -43,6 +43,7 @@ node_t* myprogram; // root node
 %type <node> VarSpec2
 %type <node> Type
 %type <node> FuncDeclaration
+%type <node> FuncHeader
 %type <node> Parameters
 %type <node> Parameters2
 %type <node> FuncBody
@@ -67,7 +68,6 @@ Declarations: VarDeclaration SEMICOLON Declarations                             
 
 VarDeclaration: VAR VarSpec                                                                                     {;}
         | VAR LPAR VarSpec SEMICOLON RPAR                                                                       {;}
-
         ;
 
 VarSpec: ID VarSpec2 Type                                                                                       {;}
@@ -83,10 +83,13 @@ Type:   INT                                                                     
         | STRING                                                                                                {;}
         ;
 
-FuncDeclaration: FUNC ID LPAR Parameters RPAR Type FuncBody                                                     {;}
-        | FUNC ID LPAR Parameters RPAR FuncBody                                                                 {;}
-        | FUNC ID LPAR RPAR Type FuncBody                                                                       {;}
-        | FUNC ID LPAR RPAR FuncBody                                                                            {;}
+FuncDeclaration: FuncHeader FuncBody                                                                            {;}
+        ;
+
+FuncHeader: FUNC ID LPAR Parameters RPAR Type                                                                   {;}
+        | FUNC ID LPAR Parameters RPAR                                                                          {;}
+        | FUNC ID LPAR RPAR Type                                                                                {;}
+        | FUNC ID LPAR RPAR                                                                                     {;}
         ;
 
 Parameters: ID Type Parameters2                                                                                 {;}
@@ -110,7 +113,7 @@ Statement: ID ASSIGN Expr                                                       
         | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {;}
         | IF Expr LBRACE Statement2 RBRACE                                                                      {;}
         | FOR Expr LBRACE Statement2 RBRACE                                                                     {;}
-        | FOR  LBRACE Statement2 RBRACE                                                                         {;}
+        | FOR      LBRACE Statement2 RBRACE                                                                         {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
@@ -127,7 +130,7 @@ ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR      
         ;
 
 FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                                                               {;}
-        | ID LPAR RPAR                                                                                          {;}
+        |       ID LPAR                      RPAR                                                                                          {;}
         ;
 
 FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
