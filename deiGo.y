@@ -6,7 +6,6 @@
 #include "structures.h"
 #include "y.tab.h"
 
-
 int yylex (void);
 void yyerror (const char *s);
 

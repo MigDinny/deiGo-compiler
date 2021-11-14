@@ -93,7 +93,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 "]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RSQ;}
 "return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RETURN;}
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) { printf("%d", ID); return ID; }}
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) { return ID; }}
 {int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return INTLIT;}
 {real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return REALLIT;}
 
