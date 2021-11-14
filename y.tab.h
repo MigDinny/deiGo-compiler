@@ -49,40 +49,110 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INTEGER = 258,
-    DOUBLE = 259,
-    CHARACTER = 260,
-    LET = 261,
-    IN = 262,
-    END = 263,
-    WRITE = 264,
-    IDENTIFIER = 265
+    SEMICOLON = 258,
+    COMMA = 259,
+    BLANKID = 260,
+    ASSIGN = 261,
+    STAR = 262,
+    DIV = 263,
+    MINUS = 264,
+    PLUS = 265,
+    EQ = 266,
+    GE = 267,
+    GT = 268,
+    LBRACE = 269,
+    LE = 270,
+    LPAR = 271,
+    LSQ = 272,
+    LT = 273,
+    MOD = 274,
+    NE = 275,
+    NOT = 276,
+    AND = 277,
+    OR = 278,
+    PACKAGE = 279,
+    ELSE = 280,
+    FOR = 281,
+    IF = 282,
+    VAR = 283,
+    INT = 284,
+    FLOAT32 = 285,
+    BOOL = 286,
+    STRING = 287,
+    PRINT = 288,
+    PARSEINT = 289,
+    FUNC = 290,
+    CMDARGS = 291,
+    RBRACE = 292,
+    RPAR = 293,
+    RSQ = 294,
+    RETURN = 295,
+    ID = 296,
+    RESERVED = 297,
+    INTLIT = 298,
+    REALLIT = 299,
+    STRLIT = 300,
+    MUL = 301,
+    UNARY = 302
   };
 #endif
 /* Tokens.  */
-#define INTEGER 258
-#define DOUBLE 259
-#define CHARACTER 260
-#define LET 261
-#define IN 262
-#define END 263
-#define WRITE 264
-#define IDENTIFIER 265
+#define SEMICOLON 258
+#define COMMA 259
+#define BLANKID 260
+#define ASSIGN 261
+#define STAR 262
+#define DIV 263
+#define MINUS 264
+#define PLUS 265
+#define EQ 266
+#define GE 267
+#define GT 268
+#define LBRACE 269
+#define LE 270
+#define LPAR 271
+#define LSQ 272
+#define LT 273
+#define MOD 274
+#define NE 275
+#define NOT 276
+#define AND 277
+#define OR 278
+#define PACKAGE 279
+#define ELSE 280
+#define FOR 281
+#define IF 282
+#define VAR 283
+#define INT 284
+#define FLOAT32 285
+#define BOOL 286
+#define STRING 287
+#define PRINT 288
+#define PARSEINT 289
+#define FUNC 290
+#define CMDARGS 291
+#define RBRACE 292
+#define RPAR 293
+#define RSQ 294
+#define RETURN 295
+#define ID 296
+#define RESERVED 297
+#define INTLIT 298
+#define REALLIT 299
+#define STRLIT 300
+#define MUL 301
+#define UNARY 302
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "ficha4.2.y"
+#line 15 "deiGo.y"
 
-    char *id;
-    is_program* ip;
-    is_vardec_list* ivl;
-    is_vardec* iv;
-    is_statement_list* isl;
-    is_statement* is;
+    char *letters;
+    node_t *node;
 
-#line 86 "y.tab.h"
+#line 156 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -8,7 +8,7 @@
 int yylex (void);
 void yyerror(char* s);
 
-node* myprogram; // root node
+node_t* myprogram; // root node
 
 %}
 
@@ -17,7 +17,7 @@ node* myprogram; // root node
     node_t *node;
 }
 
-%token COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
+%token SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
 %token <letters> ID RESERVED INTLIT REALLIT STRLIT
 
 %left COMMA
@@ -104,10 +104,10 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
     
 Statement: ID ASSIGN Expr                                                                                       {;}
         | LBRACE Statement2 RBRACE                                                                              {;}
-        | IF Expr LBRACE Statement 2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
-        | IF Expr LBRACE Statement 2 RBRACE                                                                     {;}
-        | FOR Expr LBRACE Statement 2 RBRACE                                                                    {;}
-        | FOR  LBRACE Statement 2 RBRACE                                                                        {;}
+        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
+        | IF Expr LBRACE Statement2 RBRACE                                                                     {;}
+        | FOR Expr LBRACE Statement2 RBRACE                                                                    {;}
+        | FOR  LBRACE Statement2 RBRACE                                                                        {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
