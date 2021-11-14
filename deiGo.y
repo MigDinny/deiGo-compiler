@@ -8,10 +8,12 @@
 
 
 int yylex (void);
-void yyerror(char* s);
+void yyerror (const char *s);
 
 node_t *myprogram; // root node
 node_t *temp; // temp node to use as an aux
+
+extern char *yytext;
 
 %}
 
@@ -62,7 +64,7 @@ node_t *temp; // temp node to use as an aux
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);}
+Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);  print_tree(myprogram, 0);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
@@ -189,6 +191,6 @@ Assign: ASSIGN                                                                  
 
 %%
 
-void yyerror(char *msg) {
-    printf("%s", msg);
+void yyerror (const char *s) { 
+    printf ("%s: %s\n", s, yytext);
 }
