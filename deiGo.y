@@ -59,7 +59,7 @@ node_t* myprogram; // root node
 
 %%
 
-Program: PACKAGE ID SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);}
+Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
@@ -71,10 +71,10 @@ VarDeclaration: VAR VarSpec                                                     
         | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = create_node("VarDecl"); add_child($$, $3);}
         ;
 
-VarSpec: ID VarSpec2 Type                                                                                       {;}
+VarSpec: Id VarSpec2 Type                                                                                       {;}
         ;
 
-VarSpec2: COMMA ID VarSpec2                                                                                     {;}
+VarSpec2: COMMA Id VarSpec2                                                                                     {;}
         | /* empty */                                                                                           {;}
         ;
 
@@ -87,16 +87,16 @@ Type:   INT                                                                     
 FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); add_child($$, $1); add_child($$, $2);}
         ;
 
-FuncHeader: FUNC ID LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
-        | FUNC ID LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
-        | FUNC ID LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2);  }
-        | FUNC ID LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);  }
+FuncHeader: FUNC Id LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
+        | FUNC Id LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
+        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2);  }
+        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);  }
         ;
 
-Parameters: ID Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); add_child($$, $3); }
+Parameters: Id Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); add_child($$, $3); }
         ;
 
-ParametersDecl: COMMA ID Type ParametersDecl                                                                    {$$ = create_node("ParamDecl"); add_child($$, $3); add_child($$, $2); add_next($$, $4); }
+ParametersDecl: COMMA Id Type ParametersDecl                                                                    {$$ = create_node("ParamDecl"); add_child($$, $3); add_child($$, $2); add_next($$, $4); }
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
@@ -112,7 +112,7 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
         | /* epsilon */                                                                                         {$$ = NULL;}
         ;
     
-Statement: ID ASSIGN Expr                                                                                       {;}
+Statement: Id ASSIGN Expr                                                                                       {;}
         | LBRACE Statement2 RBRACE                                                                              {;}
         | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {;}
         | IF Expr LBRACE Statement2 RBRACE                                                                      {;}
@@ -130,11 +130,11 @@ Statement2: Statement SEMICOLON Statement2                                      
         | /* empty */                                                                                           {;}
         ;
 
-ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
+ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
         ;
 
-FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                                                               {;}
-        |       ID LPAR                      RPAR                                                                                          {;}
+FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {;}
+        |       Id LPAR                      RPAR                                                                                          {;}
         ;
 
 FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
@@ -159,7 +159,7 @@ Expr: Expr OR Expr                                                              
         | PLUS Expr                                                                                             {;}
         | INTLIT                                                                                                {;}
         | REALLIT                                                                                               {;}
-        | ID                                                                                                    {;}
+        | Id                                                                                                    {;}
         | FuncInvocation                                                                                        {;}
         | LPAR Expr RPAR                                                                                        {;}
         ;
