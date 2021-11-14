@@ -38,9 +38,11 @@ node* myprogram; // root node
 %type <node> Declarations
 %type <node> VarDeclaration
 %type <node> VarSpec
+%type <node> VarSpec2
 %type <node> Type
 %type <node> FuncDeclaration
 %type <node> Parameters
+%type <node> Parameters2
 %type <node> FuncBody
 %type <node> VarsAndStatements
 %type <node> Statement
@@ -63,10 +65,11 @@ VarDeclaration: VAR VarSpec                                                     
         | VAR LPAR VarSpec SEMICOLON RPAR                                                                       {;}
         ;
 
-VarSpec: ID VarSpec Type                                                                                        {;}
-        | COMMA ID                                                                                              {;}
-        | /* empty */                                                                                           {;}
+VarSpec: ID VarSpec2 Type                                                                                       {;}
         ;
+
+VarSpec2: COMMA ID                                                                                              {;}
+        | /* empty */                                                                                           {;}
 
 Type:   INT                                                                                                     {;}
         | FLOAT32                                                                                               {;}
@@ -97,9 +100,11 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
         ;
     
 Statement: ID ASSIGN Expr                                                                                       {;}
-        | LBRACE {Statement SEMICOLON} RBRACE                                                                   {;}
-        | IF Expr LBRACE {Statement SEMICOLON} RBRACE [ELSE LBRACE {Statement SEMICOLON} RBRACE]                {;}
-        | FOR [Expr] LBRACE {Statement SEMICOLON} RBRACE                                                        {;}
+        | LBRACE Statement2 RBRACE                                                                              {;}
+        | IF Expr LBRACE Statement 2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
+        | IF Expr LBRACE Statement 2 RBRACE                                                                     {;}
+        | FOR Expr LBRACE Statement 2 RBRACE                                                                    {;}
+        | FOR  LBRACE Statement 2 RBRACE                                                                        {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
@@ -108,15 +113,18 @@ Statement: ID ASSIGN Expr                                                       
         | PRINT LPAR STRLIT RPAR                                                                                {;}
         ;
 
+Statement2: Statement SEMICOLON                                                                                 {;}
+        | /* empty */                                                                                           {;}
+
 ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
         ;
 
-FuncInvocation: ID LPAR Expr {COMMA Expr} RPAR                                                                  {;}
-        | ID LPAR Expr FuncInvocation RPAR                                                                      {;}
-        | COMMA Expr                                                                                            {;}
+FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                                                               {;}
         | ID LPAR RPAR                                                                                          {;}
-        | /* empty */                                                                                           {;}
         ;
+
+FuncInvocation2: COMMA Expr                                                                                     {;}
+        | /* empty */                                                                                           {;}
 
 Expr: Expr OR Expr                                                                                              {;}      
         | Expr AND Expr                                                                                         {;}
