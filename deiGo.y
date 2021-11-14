@@ -71,26 +71,26 @@ VarDeclaration: VAR VarSpec                                                     
         | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = create_node("VarDecl"); add_child($$, $3);}
         ;
 
-VarSpec: Id VarSpec2 Type                                                                                       {;}
+VarSpec: Id VarSpec2 Type                                                                                       {$$ = $1; add_next($$, $2); add_next($2, $3);}
         ;
 
-VarSpec2: COMMA Id VarSpec2                                                                                     {;}
-        | /* empty */                                                                                           {;}
+VarSpec2: COMMA Id VarSpec2                                                                                     {$$ = $2; add_next($$, $3);}
+        | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-Type:   INT                                                                                                     {;}
-        | FLOAT32                                                                                               {;}
-        | BOOL                                                                                                  {;}
-        | STRING                                                                                                {;}
+Type:   INT                                                                                                     {$$ = create_node("Int");}
+        | FLOAT32                                                                                               {$$ = create_node("Float32");}
+        | BOOL                                                                                                  {$$ = create_node("Bool");}
+        | STRING                                                                                                {$$ = create_node("String");}
         ;
 
 FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); add_child($$, $1); add_child($$, $2);}
         ;
 
-FuncHeader: FUNC Id LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
-        | FUNC Id LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); }
-        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2);  }
-        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);  }
+FuncHeader: FUNC Id LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4); add_child($$, $6);}
+        | FUNC Id LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4);}
+        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $5);}
+        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);}
         ;
 
 Parameters: Id Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); add_child($$, $3); }
@@ -130,38 +130,38 @@ Statement2: Statement SEMICOLON Statement2                                      
         | /* empty */                                                                                           {;}
         ;
 
-ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
+ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_child($$, $4); add_next($$, $9);}
         ;
 
-FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {;}
-        |       Id LPAR                      RPAR                                                                                          {;}
+FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {$$ = $1; add_next($$, $3); add_next($3, $4);}
+        |       Id LPAR                      RPAR                                                               {$$ = $1;}
         ;
 
-FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
-        | /* empty */                                                                                           {;}
+FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {$$ = $2; add_next($$, $3)}
+        | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-Expr: Expr OR Expr                                                                                              {;}      
-        | Expr AND Expr                                                                                         {;}
-        | Expr LT Expr                                                                                          {;}
-        | Expr GT Expr                                                                                          {;}
-        | Expr EQ Expr                                                                                          {;}
-        | Expr NE Expr                                                                                          {;}
-        | Expr LE Expr                                                                                          {;}
-        | Expr GE Expr                                                                                          {;}
-        | Expr PLUS Expr                                                                                        {;}
-        | Expr MINUS Expr                                                                                       {;}
-        | Expr STAR Expr                                                                                        {;}
-        | Expr DIV Expr                                                                                         {;}
-        | Expr MOD Expr                                                                                         {;}
-        | NOT Expr                                                                                              {;}
-        | MINUS Expr                                                                                            {;}
-        | PLUS Expr                                                                                             {;}
-        | INTLIT                                                                                                {;}
-        | REALLIT                                                                                               {;}
-        | Id                                                                                                    {;}
-        | FuncInvocation                                                                                        {;}
-        | LPAR Expr RPAR                                                                                        {;}
+Expr: Expr OR Expr                                                                                              {$$ = $1; add_child($$, $2); add_next($$, $3);}      
+        | Expr AND Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr LT Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr GT Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr EQ Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr NE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr LE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr GE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr PLUS Expr                                                                                        {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr MINUS Expr                                                                                       {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr STAR Expr                                                                                        {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr DIV Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | Expr MOD Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
+        | NOT Expr                                                                                              {$$ = $1; add_next($$, $2);} 
+        | MINUS Expr                                                                                            {$$ = $1; add_next($$, $2);} 
+        | PLUS Expr                                                                                             {$$ = $1; add_next($$, $2);} 
+        | INTLIT                                                                                                {$$ = $1;} 
+        | REALLIT                                                                                               {$$ = $1;} 
+        | Id                                                                                                    {$$ = $1;}  
+        | FuncInvocation                                                                                        {$$ = $1;} 
+        | LPAR Expr RPAR                                                                                        {$$ = $2;} 
         ;
 
 %%
