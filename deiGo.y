@@ -58,8 +58,8 @@ Declarations:   /* empty */                        {$$ = NULL;}
         | FuncDeclaration SEMICOLON Declarations   {$$ = $1; add_next($$, $3);}
         ;
 
-VarDeclaration: VAR VarSpec                     {;}
-        | VAR LPAR VarSpec SEMICOLON RPAR       {;}
+VarDeclaration: VAR VarSpec                     {$$ = create_node("VarDeclaration"); add_child($$, $2);}
+        | VAR LPAR VarSpec SEMICOLON RPAR       {$$ = create_node("VarDeclaration"); add_child($$, $3);}
         ;
 
 VarSpec: ID { COMMA ID } Type                   {;}
