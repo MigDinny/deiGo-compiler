@@ -10,8 +10,8 @@
 int yylex (void);
 void yyerror(char* s);
 
-node_t* myprogram; // root node
-
+node_t *myprogram; // root node
+node_t *temp; // temp node to use as an aux
 
 %}
 
@@ -112,25 +112,26 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
         | /* epsilon */                                                                                         {$$ = NULL;}
         ;
     
-Statement: Id ASSIGN Expr                                                                                       {;}
-        | LBRACE Statement2 RBRACE                                                                              {;}
-        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {;}
-        | IF Expr LBRACE Statement2 RBRACE                                                                      {;}
-        | FOR Expr LBRACE Statement2 RBRACE                                                                     {;}
-        | FOR      LBRACE Statement2 RBRACE                                                                         {;}
-        | RETURN Expr                                                                                           {;}
-        | RETURN                                                                                                {;}
-        | FuncInvocation                                                                                        {;}
-        | ParseArgs                                                                                             {;}
-        | PRINT LPAR Expr RPAR                                                                                  {;}
-        | PRINT LPAR STRLIT2 RPAR                                                                               {;}
+
+Statement: Id Assign Expr                                                                                       {$$ = $2; add_child($$, $1); add_child($$, $3); }
+        | LBRACE Statement2 RBRACE                                                                              {$$ = $2;}
+        | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {$$ = create_node("IF"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = create_block_node(); add_child(temp, $8); add_child($$, temp); temp = NULL; }
+        | IF Expr LBRACE Statement2 RBRACE                                                                      {$$ = create_node("IF"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); add_child($$, create_block_node()); temp = NULL; }
+        | FOR Expr LBRACE Statement2 RBRACE                                                                     {$$ = create_node("FOR"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = NULL;}
+        | FOR      LBRACE Statement2 RBRACE                                                                     {$$ = create_node("FOR"); temp = create_block_node(); add_child(temp, $3); add_child($$, temp); temp = NULL;}
+        | RETURN Expr                                                                                           {$$ = $2;}
+        | RETURN                                                                                                {$$ = NULL;}
+        | FuncInvocation                                                                                        {$$ = $1;}
+        | ParseArgs                                                                                             {$$ = $1;}
+        | PRINT LPAR Expr RPAR                                                                                  {$$ = $3;}
+        | PRINT LPAR Strlit2 RPAR                                                                               {$$ = $3;}
         ;
 
-Statement2: Statement SEMICOLON Statement2                                                                      {;}
-        | /* empty */                                                                                           {;}
+Statement2: Statement SEMICOLON Statement2                                                                      {$$ = $1; add_next($$, $3);}
+        | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_child($$, $4); add_next($$, $9);}
+ParseArgs: Id COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_next($$, $4); add_next($4, $9);}
         ;
 
 FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {$$ = $1; add_next($$, $3); add_next($3, $4);}
@@ -141,28 +142,49 @@ FuncInvocation2: COMMA Expr FuncInvocation2                                     
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-Expr: Expr OR Expr                                                                                              {$$ = $1; add_child($$, $2); add_next($$, $3);}      
-        | Expr AND Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr LT Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr GT Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr EQ Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr NE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr LE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr GE Expr                                                                                          {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr PLUS Expr                                                                                        {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr MINUS Expr                                                                                       {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr STAR Expr                                                                                        {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr DIV Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | Expr MOD Expr                                                                                         {$$ = $1; add_child($$, $2); add_next($$, $3);} 
-        | NOT Expr                                                                                              {$$ = $1; add_next($$, $2);} 
-        | MINUS Expr                                                                                            {$$ = $1; add_next($$, $2);} 
-        | PLUS Expr                                                                                             {$$ = $1; add_next($$, $2);} 
-        | INTLIT                                                                                                {$$ = $1;} 
-        | REALLIT                                                                                               {$$ = $1;} 
+Expr: Expr OR Expr                                                                                              {$$ = create_node("OR"); add_child($$, $1); add_child($$, $3);}      
+        | Expr AND Expr                                                                                         {$$ = create_node("AND"); add_child($$, $1); add_child($$, $3);}  
+        | Expr LT Expr                                                                                          {$$ = create_node("LT"); add_child($$, $1); add_child($$, $3);}  
+        | Expr GT Expr                                                                                          {$$ = create_node("GT"); add_child($$, $1); add_child($$, $3);}  
+        | Expr EQ Expr                                                                                          {$$ = create_node("EQ"); add_child($$, $1); add_child($$, $3);}  
+        | Expr NE Expr                                                                                          {$$ = create_node("NE"); add_child($$, $1); add_child($$, $3);}  
+        | Expr LE Expr                                                                                          {$$ = create_node("LE"); add_child($$, $1); add_child($$, $3);}  
+        | Expr GE Expr                                                                                          {$$ = create_node("GE"); add_child($$, $1); add_child($$, $3);} 
+        | Expr PLUS Expr                                                                                        {$$ = create_node("PLUS"); add_child($$, $1); add_child($$, $3);}  
+        | Expr MINUS Expr                                                                                       {$$ = create_node("MINUS"); add_child($$, $1); add_child($$, $3);}  
+        | Expr STAR Expr                                                                                        {$$ = create_node("STAR"); add_child($$, $1); add_child($$, $3);}  
+        | Expr DIV Expr                                                                                         {$$ = create_node("DIV"); add_child($$, $1); add_child($$, $3);}  
+        | Expr MOD Expr                                                                                         {$$ = create_node("MOD"); add_child($$, $1); add_child($$, $3);}  
+        | NOT Expr                                                                                              {$$ = create_node("NOT"); add_child($$, $2);} 
+        | MINUS Expr                                                                                            {$$ = create_node("MINUS"); add_child($$, $2);} 
+        | PLUS Expr                                                                                             {$$ = create_node("PLUS"); add_child($$, $2);} 
+        | Intlit                                                                                                {$$ = $1;} 
+        | Reallit                                                                                               {$$ = $1;} 
         | Id                                                                                                    {$$ = $1;}  
         | FuncInvocation                                                                                        {$$ = $1;} 
         | LPAR Expr RPAR                                                                                        {$$ = $2;} 
         ;
+
+
+
+
+        
+
+Id:     ID                                                                                                      {$$ = create_literal_node("Id", $1);}
+        ;
+
+Intlit: INTLIT                                                                                                  {$$ = create_literal_node("INTLIT", $1);}
+        ;
+
+Reallit: REALLIT                                                                                                {$$ = create_literal_node("REALLIT", $1);}
+        ;
+
+Strlit2: STRLIT2                                                                                                {$$ = create_literal_node("STRLIT", $1);}
+        ;
+
+Assign: ASSIGN                                                                                                  {$$ = create_node("Assign", $1);}
+        ;
+
 
 %%
 

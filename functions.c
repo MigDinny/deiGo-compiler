@@ -19,6 +19,21 @@ node_t* create_node(char* symbol) {
 	return n;
 }
 
+node_t* create_block_node() {
+
+	node_t *n = (node_t*) malloc(sizeof(node_t));
+	token_t *t = (token_t*) malloc(sizeof(token_t));
+
+	t->symbol = "Block";
+	//n->type = type;
+	n->children = NULL;
+	n->next 	= NULL;
+	n->token = t;
+	n->literal = 0;
+	
+	return n;
+}
+
 node_t* create_literal_node(char *symbol, char *value, int line, int column) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
