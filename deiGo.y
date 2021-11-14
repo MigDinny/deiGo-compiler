@@ -37,14 +37,18 @@ node* myprogram; // root node
 %type <node> Declarations
 %type <node> VarDeclaration
 %type <node> VarSpec
+%type <node> VarSpec2
 %type <node> Type
 %type <node> FuncDeclaration
 %type <node> Parameters
+%type <node> Parameters2
 %type <node> FuncBody
 %type <node> VarsAndStatements
 %type <node> Statement
+%type <node> Statement2
 %type <node> ParseArgs
 %type <node> FuncInvocation
+%type <node> FuncInvocation2
 %type <node> Expr
 
 
@@ -62,8 +66,10 @@ VarDeclaration: VAR VarSpec                     {$$ = create_node("VarDeclaratio
         | VAR LPAR VarSpec SEMICOLON RPAR       {$$ = create_node("VarDeclaration"); add_child($$, $3);}
         ;
 
-VarSpec: ID VarSpec Type                                                                                        {;}
-        | COMMA ID                                                                                              {;}
+VarSpec: ID VarSpec2 Type                                                                                       {;}
+        ;
+
+VarSpec2: COMMA ID VarSpec2                                                                                     {;}
         | /* empty */                                                                                           {;}
         ;
 
@@ -96,9 +102,11 @@ VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                   
         ;
     
 Statement: ID ASSIGN Expr                                                                                       {;}
-        | LBRACE {Statement SEMICOLON} RBRACE                                                                   {;}
-        | IF Expr LBRACE {Statement SEMICOLON} RBRACE [ELSE LBRACE {Statement SEMICOLON} RBRACE]                {;}
-        | FOR [Expr] LBRACE {Statement SEMICOLON} RBRACE                                                        {;}
+        | LBRACE Statement2 RBRACE                                                                              {;}
+        | IF Expr LBRACE Statement 2 RBRACE ELSE LBRACE Statement2 RBRACE                                       {;}
+        | IF Expr LBRACE Statement 2 RBRACE                                                                     {;}
+        | FOR Expr LBRACE Statement 2 RBRACE                                                                    {;}
+        | FOR  LBRACE Statement 2 RBRACE                                                                        {;}
         | RETURN Expr                                                                                           {;}
         | RETURN                                                                                                {;}
         | FuncInvocation                                                                                        {;}
@@ -107,13 +115,18 @@ Statement: ID ASSIGN Expr                                                       
         | PRINT LPAR STRLIT RPAR                                                                                {;}
         ;
 
+Statement2: Statement SEMICOLON Statement2                                                                      {;}
+        | /* empty */                                                                                           {;}
+        ;
+
 ParseArgs: ID COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {;}
         ;
 
-FuncInvocation: ID LPAR Expr {COMMA Expr} RPAR                                                                  {;}
-        | ID LPAR Expr FuncInvocation RPAR                                                                      {;}
-        | COMMA Expr                                                                                            {;}
+FuncInvocation: ID LPAR Expr FuncInvocation2 RPAR                                                               {;}
         | ID LPAR RPAR                                                                                          {;}
+        ;
+
+FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {;}
         | /* empty */                                                                                           {;}
         ;
 
