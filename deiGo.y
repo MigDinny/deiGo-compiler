@@ -62,8 +62,8 @@ Declarations: VarDeclaration SEMICOLON Declarations                             
         | /* empty */                                                                   {$$ = NULL;}
         ;
 
-VarDeclaration: VAR VarSpec                     {$$ = create_node("VarDeclaration"); add_child($$, $2);}
-        | VAR LPAR VarSpec SEMICOLON RPAR       {$$ = create_node("VarDeclaration"); add_child($$, $3);}
+VarDeclaration: VAR VarSpec                     {$$ = create_node("VarDecl"); add_child($$, $2);}
+        | VAR LPAR VarSpec SEMICOLON RPAR       {$$ = create_node("VarDecl"); add_child($$, $3);}
         ;
 
 VarSpec: ID VarSpec2 Type                                                                                       {;}
@@ -79,17 +79,19 @@ Type:   INT                                                                     
         | STRING                                                                                                {;}
         ;
 
-FuncDeclaration: FUNC ID LPAR Parameters RPAR Type FuncBody                                                     {;}
-        | FUNC ID LPAR Parameters RPAR FuncBody                                                                 {;}
-        | FUNC ID LPAR RPAR Type FuncBody                                                                       {;}
-        | FUNC ID LPAR RPAR FuncBody                                                                            {;}
+FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); /*add_child($$, $4); add_child($$, $6); add_child($$, $7);*/};
+
+FuncHeader: FUNC ID LPAR Parameters RPAR Type                                   {;}
+        | FUNC ID LPAR Parameters RPAR                                          {;}
+        | FUNC ID LPAR RPAR Type                                                {;}
+        | FUNC ID LPAR RPAR                                                     {;}
         ;
 
-Parameters: ID Type Parameters2                                                                                 {;}
+Parameters: ID Type Parameters2                                                                                 {$$ = create_node("FuncParams"); add_child($$, $2); add_child($$, $3);}
         ;
 
 Parameters2: COMMA ID Type Parameters2                                                                          {;}
-        | /* empty */                                                                                           {;}
+        | /* empty */                                                                                           {$$ = NULL;}
         ;
 
 FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {;}
