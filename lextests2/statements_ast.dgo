@@ -1,0 +1,74 @@
+package main;
+
+func empty(/* No Params */) /* No return Type */ {
+    // No FuncBody
+}
+
+func sum(x int, y int) int {
+    return x + y
+}
+
+func main(a int, b float32, c string, d bool) int {
+    var x, y, z int;
+    var (i, j, k bool;)
+
+    x = 1
+
+    if (x == 1) {
+        //Empty Block
+    }
+
+    var (p float32;)
+
+    if x == 2 {
+        //Empty Block
+    } else {
+        //Empty Block
+    }
+    
+    for {                   // No Expression
+        // Empty Block
+    }
+
+    for expression {
+        // Empty Block
+    }
+
+    i = 0;
+    for (i < 10) {
+        i = i + 1
+    }
+
+    {
+        //Empty Block
+    }
+
+    {
+        //Block with one statement
+        a = 1
+    }   
+
+    {
+        //Block with two Statements
+        a = 2
+        empty()
+    }
+
+    x, _ = strconv.Atoi(os.Args[1])
+
+    y = sum(a, x)
+
+    fmt.Println("This is a string literal.")
+
+    if y > 10 {
+        fmt.Println("y is greater than 10.")
+        y = y / 2
+    } else {
+        fmt.Println("y is lower than 10.")
+        y = y * 2
+    }
+
+    return /* No Expression */
+
+    return 1/1*1%1+1-1
+}
