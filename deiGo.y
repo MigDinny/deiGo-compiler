@@ -75,10 +75,10 @@ VarDeclaration: VAR VarSpec                                                     
         | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = create_node("VarDecl"); add_child($$, $3);}
         ;
 
-VarSpec: Id VarSpec2 Type                                                                                       {$$ = $1; add_next($$, $2); add_next($2, $3);}
+VarSpec: Id Type VarSpec2                                                                                       {$$ = $2; add_next($$, $1); add_next($1, $3); }
         ;
 
-VarSpec2: COMMA Id VarSpec2                                                                                     {$$ = $2; add_next($$, $3);}
+VarSpec2: COMMA Id Type VarSpec2                                                                                {$$ = $3; add_next($$, $2); add_next($2, $4); }
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
@@ -93,8 +93,8 @@ FuncDeclaration: FuncHeader FuncBody                                            
 
 FuncHeader: FUNC Id LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $6); add_child($$, $4); }
         | FUNC Id LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4);}
-        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $5);}
-        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2);}
+        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams")); add_child($$, $5);}
+        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams"));}
         ;
 
 Parameters: Id Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); temp = create_node("ParamDecl"); add_child(temp, $2); add_child(temp, $1); add_child($$, temp); temp = NULL; add_child($$, $3); }
@@ -108,9 +108,9 @@ ParametersDecl: COMMA Id Type ParametersDecl                                    
 FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {$$ = create_node("FuncBody"); add_child($$, $2); }
         ;
 
-VarsAndStatements: VarsAndStatements VarDeclaration SEMICOLON                                                   {$$ = $2; add_next($$, $1);}
-        | VarsAndStatements Statement SEMICOLON                                                                 {$$ = $2; add_next($$, $1);} 
-        | VarsAndStatements SEMICOLON                                                                           {$$ = $1; }
+VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements                                            {$$ = $1; add_next($$, $3);}
+        |  Statement SEMICOLON             VarsAndStatements                                                    {$$ = $1; add_next($$, $3);} 
+        |  SEMICOLON                     VarsAndStatements                                                      {$$ = $2; }
         | /* epsilon */                                                                                         {$$ = NULL;}
         ;
     
@@ -125,15 +125,15 @@ Statement: Id Assign Expr                                                       
         | RETURN                                                                                                {$$ = create_node("Return");}
         | FuncInvocation                                                                                        {$$ = $1;}
         | ParseArgs                                                                                             {$$ = $1;}
-        | PRINT LPAR Expr RPAR                                                                                  {$$ = $3;}
-        | PRINT LPAR Strlit2 RPAR                                                                               {$$ = $3;}
+        | PRINT LPAR Expr RPAR                                                                                  {$$ = create_node("Print"); add_child($$, $3);}
+        | PRINT LPAR Strlit2 RPAR                                                                               {$$ = create_node("Print"); add_child($$, $3);}
         ;
 
 Statement2: Statement SEMICOLON Statement2                                                                      {$$ = $1; add_next($$, $3);}
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-ParseArgs: Id COMMA BLANKID Assign PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = $1; add_next($$, $4); add_next($4, $9);}
+ParseArgs: Id COMMA BLANKID Assign PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = create_node("ParseArgs"); add_child($$, $1); add_child($$, $9);}
         ;
 
 FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {$$ = $1; add_next($$, $3); add_next($3, $4);}
@@ -163,7 +163,7 @@ Expr: Expr OR Expr                                                              
         | Intlit                                                                                                {$$ = $1;} 
         | Reallit                                                                                               {$$ = $1;} 
         | Id                                                                                                    {$$ = $1;}  
-        | FuncInvocation                                                                                        {$$ = $1;} 
+        | FuncInvocation                                                                                        {$$ = create_node("Call"); add_child($$, $1);} 
         | LPAR Expr RPAR                                                                                        {$$ = $2;} 
         ;
 
