@@ -27,7 +27,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     #include "functions.h"
     
     int initialLine, initialColumn = 1;
-    int flagL, flagError, flagEOF, flagEOF_strlit, strlit_buffer_pos = 0;
+    int flagL, flagError, flagEOF, flagEOFaux, flagEOF_strlit, strlit_buffer_pos = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
     char *strlit_buffer;
@@ -43,14 +43,14 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 " "                                 {yycolumnno += yyleng;}
 " "*"//"                            { BEGIN SINGLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;}
 " "*"/*"                            { BEGIN DOUBLECOMM; initialLine = yylineno; yycolumnno += yyleng; initialColumn = yycolumnno - 2;}            
-";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; flagEOF = 0;}
+";"                                 {if (flagL) printf("SEMICOLON\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return SEMICOLON;}
 
 <SINGLECOMM>.                       {yycolumnno += yyleng;}
-<SINGLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} BEGIN 0; yylineno++;  yycolumnno = 1;}
+<SINGLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0; flagEOFaux = 1;} BEGIN 0; yylineno++;  yycolumnno = 1;  if (flagEOFaux == 1 && !flagL) { flagEOFaux = 0; return SEMICOLON; }}
 
 <DOUBLECOMM><<EOF>>                 {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} printf("Line %d, column %d: unterminated comment\n", initialLine, initialColumn); yyterminate();}
 <DOUBLECOMM>"*/"                    {yycolumnno += yyleng; BEGIN 0;}
-<DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0;} yylineno++; yycolumnno = 1;}
+<DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0; flagEOFaux = 1;} yylineno++; yycolumnno = 1; if (flagEOFaux == 1 && !flagL) { flagEOFaux = 0; return SEMICOLON; }}
 <DOUBLECOMM>.                       {yycolumnno += yyleng;}
 
 {reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0; yylval.letters = strdup(yytext); if (!flagL) return RESERVED;}
@@ -93,7 +93,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 "]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RSQ;}
 "return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RETURN;}
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) { return ID; }}
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return ID;}
 {int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return INTLIT;}
 {real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return REALLIT;}
 
@@ -115,35 +115,39 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 <STRLIT>{newline}                   {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; BEGIN 0; }
 <STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); yyterminate();}   
 
-{newline}                           {if (flagEOF == 1 && flagL && !flagError) printf("SEMICOLON\n"); yylineno++; yycolumnno = 1; flagEOF = 0;}
+{newline}                           {if (flagEOF == 1 && flagL && !flagError) {printf("SEMICOLON\n"); flagEOFaux = 1; flagEOF = 0;} yylineno++; yycolumnno = 1; if ((flagEOFaux == 1 || flagEOF == 1) && !flagL && !flagError) { flagEOFaux = 0; return SEMICOLON; }}
 \t                                  {yycolumnno += yyleng;}
 .                                   {flagEOF = 0; printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
 
-<<EOF>>                             {if (flagEOF == 1) printf("SEMICOLON\n"); yyterminate();}                                
+<<EOF>>                             {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); if (!flagL && flagEOF == 1) return SEMICOLON; yyterminate();}                                
 
 %%
 
 int main(int argc, char *argv[ ])
 {
+
+    strlit_buffer = (char*) malloc(100);
+    
     if (argc > 1) {
         if (strcmp(argv[1], "-l") == 0) {
             flagL = 1;
-        }
-    }
+            yylex();
+        } else if (strcmp(argv[1], "-t") == 0) {
+            yyparse();
+            //print_tree(myprogram, 0);
+        } 
+    } else yyparse();
 
-    strlit_buffer = (char*) malloc(100);
-
-    yylex();
-
-    if (strcmp(argv[1], "-t") == 0) {
-        yyparse();
-        //print_tree(myprogram, 0);
-    }
-
+   
+    
     free(strlit_buffer);
     return 0;
 }
 
 int yywrap() {
     return 1;
+}
+
+void yyerror (const char *s) { 
+    printf ("Line %d, column %d: %s: %s\n", yylineno, yycolumnno, s, yytext);
 }

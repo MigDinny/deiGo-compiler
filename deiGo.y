@@ -63,7 +63,7 @@ extern char *yytext;
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4);  print_tree(myprogram, 0);}
+Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4); print_tree(myprogram, 0);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
@@ -190,6 +190,3 @@ Assign: ASSIGN                                                                  
 
 %%
 
-void yyerror (const char *s) { 
-    printf ("%s: %s\n", s, yytext);
-}
