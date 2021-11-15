@@ -115,7 +115,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 <STRLIT>{newline}                   {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); strlit_buffer[0] = 0; strlit_buffer_pos = 0; yylineno++; yycolumnno = 1; BEGIN 0; }
 <STRLIT><<EOF>>                     {printf("Line %d, column %d: unterminated string literal\n", initialLine, initialColumn); yyterminate();}   
 
-{newline}                           {if (flagEOF == 1 && flagL && !flagError) {printf("SEMICOLON\n"); flagEOFaux = 1; flagEOF = 0;} yylineno++; yycolumnno = 1; if ((flagEOFaux == 1 || flagEOF == 1) && !flagL && !flagError) { flagEOFaux = 0; return SEMICOLON; }}
+{newline}                           {if (flagEOF == 1 && flagL && !flagError) {printf("SEMICOLON\n"); flagEOFaux = 1; flagEOF = 0;} yylineno++; yycolumnno = 1; if ((flagEOFaux == 1 || flagEOF == 1) && !flagL && !flagError) { flagEOFaux = 0; flagEOF = 0; return SEMICOLON; }}
 \t                                  {yycolumnno += yyleng;}
 .                                   {flagEOF = 0; printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
 
