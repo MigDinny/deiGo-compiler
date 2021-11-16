@@ -69,6 +69,8 @@ void add_next(node_t *node, node_t *next) {
 
 	if (node == NULL || next == NULL) return;
 
+	for (; node->next != NULL; node = node->next); // last brother
+
 	node->next = next;
 }
 
@@ -79,9 +81,16 @@ void print_tree(node_t *root, int init_depth) {
 	for (int i = 0; i < depth; i++) printf("..");
 
 	if (root->literal == 0) printf("%s\n", root->token->symbol);
+	else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
 	else printf("%s(%s)\n", root->token->symbol, root->token->value);
 
 	if (root->children != NULL) print_tree(root->children, depth+1);
 	if (root->next != NULL) 	print_tree(root->next, depth);
 
+}
+
+int count_children(node_t *first_child) {
+	int n = 0;
+	for (; first_child != NULL; first_child = first_child->next, n++);
+	return n;
 }

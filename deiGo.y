@@ -71,14 +71,30 @@ Declarations: VarDeclaration SEMICOLON Declarations                             
         | /* empty */                                                                           {$$ = NULL;}
         ;
 
-VarDeclaration: VAR VarSpec                                                                     {$$ = create_node("VarDecl"); add_child($$, $2);}
-        | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = create_node("VarDecl"); add_child($$, $3);}
+VarDeclaration: VAR VarSpec                                                                     {$$ = $2;}
+        | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = $3;}
         ;
 
-VarSpec: Id Type VarSpec2                                                                                       {$$ = $2; add_next($$, $1); add_next($1, $3); }
+VarSpec: Id VarSpec2 Type               {
+                                        	$$ = create_node("VarDecl"); add_child($$, $3); add_child($$, $1); temp = $2; // temp is first ID of possible list
+											for (; temp != NULL;)
+											{
+												node_t * vardecl = create_node("VarDecl"); 
+												add_next($$, vardecl); // add vardecl to brother
+												add_child(vardecl, create_node($3->token->symbol));
+
+												add_child(vardecl, temp); // add id as a child of vardecl
+
+												node_t *temp2 = temp;
+
+												temp = temp->next; // iterate next original brother
+
+												temp2->next = NULL; // de-reference brother
+											}
+                                        }
         ;
 
-VarSpec2: COMMA Id Type VarSpec2                                                                                {$$ = $3; add_next($$, $2); add_next($2, $4); }
+VarSpec2: COMMA Id VarSpec2                                     {$$ = $2; add_next($$, $3); }
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
@@ -116,7 +132,13 @@ VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements            
     
 
 Statement: Id Assign Expr                                                                                       {$$ = $2; add_child($$, $1); add_child($$, $3); }
-        | LBRACE Statement2 RBRACE                                                                              {$$ = $2;}
+        | LBRACE Statement2 RBRACE                              {
+																	if (count_children($2) >= 2) { // se houver >= 2 statements, criar block
+																		temp = create_block_node();
+																		add_child(temp, $2); // statements filhos do block
+																		$$ = temp;	
+																	} else $$ = $2;
+																}
         | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {$$ = create_node("If"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = create_block_node(); add_child(temp, $8); add_child($$, temp); temp = NULL; }
         | IF Expr LBRACE Statement2 RBRACE                                                                      {$$ = create_node("If"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); add_child($$, create_block_node()); temp = NULL; }
         | FOR Expr LBRACE Statement2 RBRACE                                                                     {$$ = create_node("For"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = NULL;}
