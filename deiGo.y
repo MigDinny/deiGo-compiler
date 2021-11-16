@@ -126,7 +126,7 @@ FuncBody: LBRACE VarsAndStatements RBRACE                                       
         ;
 
 VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements                                            {$$ = $1; add_next($$, $3);}
-        |  Statement SEMICOLON             VarsAndStatements                                                    {$$ = $1; add_next($$, $3);} 
+        |  Statement SEMICOLON             VarsAndStatements                                                    { if ($1 != NULL) {$$ = $1; add_next($$, $3);} else $$ = $3;} 
         |  SEMICOLON                     VarsAndStatements                                                      {$$ = $2; }
         | /* epsilon */                                                                                         {$$ = NULL;}
         ;
