@@ -101,7 +101,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
-<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; flagError = 0; yylval.letters = strdup(strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; if (!flagL) return STRLIT2;}
+<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; yylval.letters = strdup(strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; if (!flagL && !flagError) { flagError = 0; return STRLIT2; } else flagError = 0;}
 <STRLIT>[^\\\n\r]|{escape_sequence}     {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;
@@ -151,6 +151,9 @@ int yywrap() {
     return 1;
 }
 
-void yyerror (const char *s) { 
-    printf ("Line %d, column %d: %s: %s\n", yylineno, yycolumnno, s, yytext);
+void yyerror (const char *s) {
+    if (strcmp(yytext, "\"") == 0) {
+        // syntax error: "
+        printf ("Line %d, column %d: %s: \"%s\"\n", yylineno, yycolumnno, s, yylval.letters);
+    } else printf ("Line %d, column %d: %s: %s\n", yylineno, yycolumnno, s, yytext);
 }
