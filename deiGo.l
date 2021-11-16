@@ -29,7 +29,8 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     int initialLine, initialColumn = 1;
     int flagL, flagError, flagEOF, flagEOFaux, flagEOF_strlit, flagUseAux, strlit_buffer_pos = 0;
     char left_bracket = '(';
-    int yycolumnno, yycolumnno_aux = 1;
+    int yycolumnno = 1;
+    int yycolumnno_aux = 1;
     int yylineno_aux = 0;
     char *strlit_buffer;
     int strlit_buffer_alloc_size = 100;
