@@ -122,12 +122,12 @@ ParametersDecl: COMMA Id Type ParametersDecl                                    
         ;
 
 
-FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {$$ = create_node("FuncBody"); add_child($$, $2); }
+FuncBody: LBRACE VarsAndStatements RBRACE      {$$ = create_node("FuncBody"); add_child($$, $2); }
         ;
 
-VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements                                            {$$ = $1; add_next($$, $3);}
-        |  Statement SEMICOLON             VarsAndStatements                                                    { if ($1 != NULL) {$$ = $1; add_next($$, $3);} else $$ = $3;} 
-        |  SEMICOLON                     VarsAndStatements                                                      {$$ = $2; }
+VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements       {$$ = $1; add_next($$, $3);}
+        |  Statement SEMICOLON             VarsAndStatements   { if ($1 != NULL) {$$ = $1; add_next($$, $3);} else $$ = $3;} 
+        |  SEMICOLON                     VarsAndStatements   {$$ = $2; }
         | /* epsilon */                                                                                         {$$ = NULL;}
         ;
     
@@ -153,7 +153,7 @@ Statement: Id Assign Expr                                                       
         | error																									{$$ = NULL; error = 1;}
 		;
 
-Statement2: Statement SEMICOLON Statement2                                                                      {$$ = $1; add_next($$, $3);}
+Statement2: Statement SEMICOLON Statement2                                                                      {if ($1 != NULL) { $$ = $1; add_next($$, $3); } else $$ = $3;}
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
