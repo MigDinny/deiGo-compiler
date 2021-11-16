@@ -145,7 +145,7 @@ Statement: Id Assign Expr                                                       
         | FOR      LBRACE Statement2 RBRACE                                                                     {$$ = create_node("For"); temp = create_block_node(); add_child(temp, $3); add_child($$, temp); temp = NULL;}
         | RETURN Expr                                                                                           {$$ = create_node("Return"); add_child($$, $2);}
         | RETURN                                                                                                {$$ = create_node("Return");}
-        | FuncInvocation                                                                                        {$$ = $1;}
+        | FuncInvocation                                                                                        {$$ = create_node("Call"); add_child($$, $1);}
         | ParseArgs                                                                                             {$$ = $1;}
         | PRINT LPAR Expr RPAR                                                                                  {$$ = create_node("Print"); add_child($$, $3);}
         | PRINT LPAR Strlit2 RPAR                                                                               {$$ = create_node("Print"); add_child($$, $3);}
