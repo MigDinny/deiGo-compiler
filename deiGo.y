@@ -11,6 +11,7 @@ void yyerror (const char *s);
 
 node_t *myprogram; // root node
 node_t *temp; // temp node to use as an aux
+int error = 0; // error status flag
 
 extern char *yytext;
 
@@ -63,7 +64,7 @@ extern char *yytext;
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4); print_tree(myprogram, 0);}
+Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
@@ -149,18 +150,21 @@ Statement: Id Assign Expr                                                       
         | ParseArgs                                                                                             {$$ = $1;}
         | PRINT LPAR Expr RPAR                                                                                  {$$ = create_node("Print"); add_child($$, $3);}
         | PRINT LPAR Strlit2 RPAR                                                                               {$$ = create_node("Print"); add_child($$, $3);}
-        ;
+        | error																									{$$ = NULL; error = 1;}
+		;
 
 Statement2: Statement SEMICOLON Statement2                                                                      {$$ = $1; add_next($$, $3);}
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
 ParseArgs: Id COMMA BLANKID Assign PARSEINT LPAR CMDARGS LSQ Expr RSQ RPAR                                      {$$ = create_node("ParseArgs"); add_child($$, $1); add_child($$, $9);}
-        ;
+        | Id COMMA BLANKID Assign PARSEINT LPAR error RPAR														{$$ = NULL; error = 1;}
+		;
 
 FuncInvocation: Id LPAR Expr FuncInvocation2 RPAR                                                               {$$ = $1; add_next($$, $3); add_next($3, $4);}
         |       Id LPAR                      RPAR                                                               {$$ = $1;}
-        ;
+        |		Id LPAR error RPAR 																				{$$ = NULL; error = 1;}		
+		;
 
 FuncInvocation2: COMMA Expr FuncInvocation2                                                                     {$$ = $2; add_next($$, $3);}
         | /* empty */                                                                                           {$$ = NULL;}
@@ -187,7 +191,8 @@ Expr: Expr OR Expr                                                              
         | Id                                                                                                    {$$ = $1;}  
         | FuncInvocation                                                                                        {$$ = create_node("Call"); add_child($$, $1);} 
         | LPAR Expr RPAR                                                                                        {$$ = $2;} 
-        ;
+        | LPAR error RPAR																						{$$ = NULL; error = 1;}
+		;
 
 
 
