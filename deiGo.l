@@ -37,7 +37,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
 %}
 
-%X SINGLECOMM DOUBLECOMM STRLIT
+%X SINGLECOMM DOUBLECOMM STRLIT REALLYEND
 %%
 
 " "                                 {yycolumnno += yyleng;}
@@ -119,7 +119,10 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 \t                                  {yycolumnno += yyleng;}
 .                                   {flagEOF = 0; printf("Line %d, column %d: illegal character (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng;}
 
-<<EOF>>                             {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); if (!flagL && flagEOF == 1) return SEMICOLON; yyterminate();}                                
+<REALLYEND><<EOF>>                  { yyterminate();  }
+
+<<EOF>>                             {if (flagEOF == 1 && flagL) printf("SEMICOLON\n"); if (!flagL && flagEOF == 1) { flagEOF = 0; return SEMICOLON; } else { BEGIN(REALLYEND); return EOP; }}                                
+
 
 %%
 

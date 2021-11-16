@@ -22,7 +22,7 @@ extern char *yytext;
     node_t *node;
 }
 
-%token SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
+%token EOP SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR PACKAGE ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RBRACE RPAR RSQ RETURN 
 %token <letters> ID RESERVED INTLIT REALLIT STRLIT2
 
 %left COMMA
@@ -64,7 +64,7 @@ extern char *yytext;
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations      {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
+Program: PACKAGE Id SEMICOLON Declarations EOP      {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
