@@ -64,38 +64,33 @@ extern char *yytext;
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations EOP      {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
+Program: PACKAGE Id SEMICOLON Declarations EOP                                                                  {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
         ;
 
-Declarations: VarDeclaration SEMICOLON Declarations                                             {$$ = $1; add_next($$, $3);}
-        | FuncDeclaration SEMICOLON Declarations                                                {$$ = $1; add_next($$, $3);}
-        | /* empty */                                                                           {$$ = NULL;}
+Declarations: VarDeclaration SEMICOLON Declarations                                                             {$$ = $1; add_next($$, $3);}
+        | FuncDeclaration SEMICOLON Declarations                                                                {$$ = $1; add_next($$, $3);}
+        | /* empty */                                                                                           {$$ = NULL;}
         ;
 
-VarDeclaration: VAR VarSpec                                                                     {$$ = $2;}
-        | VAR LPAR VarSpec SEMICOLON RPAR                                                       {$$ = $3;}
+VarDeclaration: VAR VarSpec                                                                                     {$$ = $2;}
+        | VAR LPAR VarSpec SEMICOLON RPAR                                                                       {$$ = $3;}
         ;
 
-VarSpec: Id VarSpec2 Type               {
-                                        	$$ = create_node("VarDecl"); add_child($$, $3); add_child($$, $1); temp = $2; // temp is first ID of possible list
-											for (; temp != NULL;)
-											{
-												node_t * vardecl = create_node("VarDecl"); 
-												add_next($$, vardecl); // add vardecl to brother
-												add_child(vardecl, create_node($3->token->symbol));
-
-												add_child(vardecl, temp); // add id as a child of vardecl
-
-												node_t *temp2 = temp;
-
-												temp = temp->next; // iterate next original brother
-
-												temp2->next = NULL; // de-reference brother
-											}
-                                        }
+VarSpec: Id VarSpec2 Type                                                                                       {$$ = create_node("VarDecl"); add_child($$, $3); add_child($$, $1); temp = $2; // temp is first ID of possible list
+											                                for (; temp != NULL;)
+											                                {
+												                        node_t * vardecl = create_node("VarDecl"); 
+												                        add_next($$, vardecl); // add vardecl to brother
+												                        add_child(vardecl, create_node($3->token->symbol));
+												                        add_child(vardecl, temp); // add id as a child of vardecl
+												                        node_t *temp2 = temp;
+												                        temp = temp->next; // iterate next original brother
+												                        temp2->next = NULL; // de-reference brother
+											                                }
+                                                                                                                }
         ;
 
-VarSpec2: COMMA Id VarSpec2                                     {$$ = $2; add_next($$, $3); }
+VarSpec2: COMMA Id VarSpec2                                                                                     {$$ = $2; add_next($$, $3); }
         | /* empty */                                                                                           {$$ = NULL;}
         ;
 
@@ -105,13 +100,13 @@ Type:   INT                                                                     
         | STRING                                                                                                {$$ = create_node("String");}
         ;
 
-FuncDeclaration: FuncHeader FuncBody                                                     {$$ = create_node("FuncDecl"); add_child($$, $1); add_child($$, $2);}
+FuncDeclaration: FuncHeader FuncBody                                                                            {$$ = create_node("FuncDecl"); add_child($$, $1); add_child($$, $2);}
         ;
 
-FuncHeader: FUNC Id LPAR Parameters RPAR Type                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $6); add_child($$, $4); }
-        | FUNC Id LPAR Parameters RPAR                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4);}
-        | FUNC Id LPAR RPAR Type                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams")); add_child($$, $5);}
-        | FUNC Id LPAR RPAR                                                     {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams"));}
+FuncHeader: FUNC Id LPAR Parameters RPAR Type                                                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $6); add_child($$, $4); }
+        | FUNC Id LPAR Parameters RPAR                                                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4);}
+        | FUNC Id LPAR RPAR Type                                                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams")); add_child($$, $5);}
+        | FUNC Id LPAR RPAR                                                                                     {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams"));}
         ;
 
 Parameters: Id Type ParametersDecl                                                                              {$$ = create_node("FuncParams"); temp = create_node("ParamDecl"); add_child(temp, $2); add_child(temp, $1); add_child($$, temp); temp = NULL; add_child($$, $3); }
@@ -122,24 +117,22 @@ ParametersDecl: COMMA Id Type ParametersDecl                                    
         ;
 
 
-FuncBody: LBRACE VarsAndStatements RBRACE      {$$ = create_node("FuncBody"); add_child($$, $2); }
+FuncBody: LBRACE VarsAndStatements RBRACE                                                                       {$$ = create_node("FuncBody"); add_child($$, $2); }
         ;
 
-VarsAndStatements:  VarDeclaration SEMICOLON       VarsAndStatements       {$$ = $1; add_next($$, $3);}
-        |  Statement SEMICOLON             VarsAndStatements   { if ($1 != NULL) {$$ = $1; add_next($$, $3);} else $$ = $3;} 
-        |  SEMICOLON                     VarsAndStatements   {$$ = $2; }
-        | /* epsilon */                                                                                         {$$ = NULL;}
+VarsAndStatements:  VarDeclaration SEMICOLON VarsAndStatements                                                  {$$ = $1; add_next($$, $3);}
+        |  Statement SEMICOLON VarsAndStatements                                                                {if ($1 != NULL) {$$ = $1; add_next($$, $3);} else $$ = $3;} 
+        |  SEMICOLON VarsAndStatements                                                                          {$$ = $2; }
+        |  /* epsilon */                                                                                        {$$ = NULL;}
         ;
     
 
 Statement: Id Assign Expr                                                                                       {$$ = $2; add_child($$, $1); add_child($$, $3); }
-        | LBRACE Statement2 RBRACE                              {
-																	if (count_children($2) >= 2) { // se houver >= 2 statements, criar block
+        | LBRACE Statement2 RBRACE                                                                              {if (count_children($2) >= 2) { // se houver >= 2 statements, criar block
 																		temp = create_block_node();
 																		add_child(temp, $2); // statements filhos do block
-																		$$ = temp;	
-																	} else $$ = $2;
-																}
+																		$$ = temp;} 
+                                                                                                                else $$ = $2;}
         | IF Expr LBRACE Statement2 RBRACE ELSE LBRACE Statement2 RBRACE                                        {$$ = create_node("If"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = create_block_node(); add_child(temp, $8); add_child($$, temp); temp = NULL; }
         | IF Expr LBRACE Statement2 RBRACE                                                                      {$$ = create_node("If"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); add_child($$, create_block_node()); temp = NULL; }
         | FOR Expr LBRACE Statement2 RBRACE                                                                     {$$ = create_node("For"); add_child($$, $2); temp = create_block_node(); add_child(temp, $4); add_child($$, temp); temp = NULL;}
