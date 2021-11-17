@@ -184,8 +184,8 @@ Expr: Expr OR Expr                                                              
         | Expr DIV Expr                                                                                         {$$ = create_node("Div"); add_child($$, $1); add_child($$, $3);}  
         | Expr MOD Expr                                                                                         {$$ = create_node("Mod"); add_child($$, $1); add_child($$, $3);}  
         | NOT Expr                                                                                              {$$ = create_node("Not"); add_child($$, $2);} 
-        | MINUS Expr                                                                                            {$$ = create_node("Minus"); add_child($$, $2);} 
-        | PLUS Expr                                                                                             {$$ = create_node("Plus"); add_child($$, $2);} 
+        | MINUS Expr  %prec UNARY                                                                               {$$ = create_node("Minus"); add_child($$, $2);} 
+        | PLUS Expr   %prec UNARY                                                                               {$$ = create_node("Plus"); add_child($$, $2);} 
         | Intlit                                                                                                {$$ = $1;} 
         | Reallit                                                                                               {$$ = $1;} 
         | Id                                                                                                    {$$ = $1;}  
