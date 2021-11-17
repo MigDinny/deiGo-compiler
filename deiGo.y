@@ -105,7 +105,7 @@ FuncDeclaration: FuncHeader FuncBody                                            
 
 FuncHeader: FUNC Id LPAR Parameters RPAR Type                                                                   {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $6); add_child($$, $4); }
         | FUNC Id LPAR Parameters RPAR                                                                          {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $4);}
-        | FUNC Id LPAR RPAR Type                                                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams")); add_child($$, $5);}
+        | FUNC Id LPAR RPAR Type                                                                                {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, $5); add_child($$, create_node("FuncParams")); }
         | FUNC Id LPAR RPAR                                                                                     {$$ = create_node("FuncHeader"); add_child($$, $2); add_child($$, create_node("FuncParams"));}
         ;
 
