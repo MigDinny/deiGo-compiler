@@ -148,6 +148,7 @@ int main(int argc, char *argv[ ])
    
     
     free(strlit_buffer);
+    free(myprogram);
     return 0;
 }
 
