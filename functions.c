@@ -122,16 +122,27 @@ symtab* create_table(symtab *global, elem *origin) {
 	t->first_child = create_element("return", NULL, origin->type, 0);
 	t->next = NULL;
 
-	if (global != NULL) {
-		if (global->next == NULL)
-			global->next = t;
-		else {
-			symtab *last_table = global->next;
-			for (; last_table->next != NULL; last_table = last_table->next);
-			
-			last_table->next = t;
-		}
+	
+	if (global->next == NULL)
+		global->next = t;
+	else {
+		symtab *last_table = global->next;
+		for (; last_table->next != NULL; last_table = last_table->next);
+		
+		last_table->next = t;
 	}
+	
+
+	return t;
+}
+
+symtab *create_global_table() {
+	symtab *t = (symtab*) malloc(sizeof(symtab));
+
+	t->name = NULL;
+	t->params = NULL;
+	t->first_child = NULL;
+	t->next = NULL;
 
 	return t;
 }
@@ -140,10 +151,24 @@ elem* create_element(char *id, char *params, char *type, int isFunction) {
 	elem *e = (elem*) malloc(sizeof(elem));
 	
 	e->id = id;
+
 	if (params == NULL) e->params = "()";
 	else e->params = params;
-	e->type = type;
+
+	if (type == NULL) e->type = "none";
+	else e->type = type;
+
 	e->next = NULL;
 	
 	return e;
+}
+
+
+void traverseAndPopulateTable(symtab *global) {
+
+}
+
+
+void traverseAndCheckTree() {
+	
 }

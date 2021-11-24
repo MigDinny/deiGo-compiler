@@ -13,7 +13,11 @@ node_t *myprogram; // root node
 node_t *temp; // temp node to use as an aux
 int error = 0; // error status flag
 
+symtab *global; // global table
+
+
 extern char *yytext;
+extern int flagT;
 
 %}
 
@@ -64,7 +68,7 @@ extern char *yytext;
 
 %%
 
-Program: PACKAGE Id SEMICOLON Declarations EOP                                                                  {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error) print_tree(myprogram, 0);}
+Program: PACKAGE Id SEMICOLON Declarations EOP                                                                  {$$ = myprogram = create_node("Program"); add_child($$, $4); if (!error && flagT) print_tree(myprogram, 0);}
         ;
 
 Declarations: VarDeclaration SEMICOLON Declarations                                                             {$$ = $1; add_next($$, $3);}

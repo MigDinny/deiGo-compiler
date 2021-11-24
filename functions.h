@@ -13,3 +13,5 @@ int count_children(node_t *first_child);
 void insert_element(symtab *table, elem *new);
 symtab* create_table(symtab *global, elem *origin);
 elem* create_element(char *id, char *params, char *type, int isFunction);
+void traverseAndPopulateTable(symtab *global);
+void traverseAndCheckTree();
