@@ -94,3 +94,56 @@ int count_children(node_t *first_child) {
 	for (; first_child != NULL; first_child = first_child->next, n++);
 	return n;
 }
+
+
+
+
+/*
+VarDecl
+FuncDecl
+*/
+void insert_element(symtab *table, elem *new) {
+	if (table->first_child == NULL)
+		table->first_child = new;
+	else {
+		elem *last_child = table->first_child;
+		for (; last_child->next != NULL; last_child = last_child->next);
+		
+		last_child->next = new;
+	}
+}
+
+
+symtab* create_table(symtab *global, elem *origin) {
+	symtab *t = (symtab*) malloc(sizeof(symtab));
+	
+	t->name = origin->id;
+	t->params = origin->params;
+	t->first_child = create_element("return", NULL, origin->type, 0);
+	t->next = NULL;
+
+	if (global != NULL) {
+		if (global->next == NULL)
+			global->next = t;
+		else {
+			symtab *last_table = global->next;
+			for (; last_table->next != NULL; last_table = last_table->next);
+			
+			last_table->next = t;
+		}
+	}
+
+	return t;
+}
+
+elem* create_element(char *id, char *params, char *type, int isFunction) {
+	elem *e = (elem*) malloc(sizeof(elem));
+	
+	e->id = id;
+	if (params == NULL) e->params = "()";
+	else e->params = params;
+	e->type = type;
+	e->next = NULL;
+	
+	return e;
+}

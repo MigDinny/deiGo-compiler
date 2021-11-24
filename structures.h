@@ -25,4 +25,23 @@ typedef struct node {
 } node_t;
 
 
+typedef struct elem_t {
+	
+	char *id;
+	char *params;
+	char *type;
+	
+	struct elem_t *next;
+	
+} elem;
+
+
+typedef struct symtab_t {
+	char *name; // table name
+	char *params;
+	
+	struct symtab_t *next;
+	struct elem_t   *first_child;
+} symtab;
+
 #endif

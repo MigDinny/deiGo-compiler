@@ -137,13 +137,24 @@ int main(int argc, char *argv[ ])
     
     if (argc > 1) {
         if (strcmp(argv[1], "-l") == 0) {
+            // análise lexical only
             flagL = 1;
             yylex();
         } else if (strcmp(argv[1], "-t") == 0) {
+            // análise lexical, análise sintatica e PRINT TREE
             yyparse();
-            //print_tree(myprogram, 0);
-        } 
-    } else yyparse();
+        } else if (strcmp(argv[1], "-s") == 0) {
+            // análise lexical, análise sintática e semantica. print tabelas + arvore anotada
+
+        }
+    } else {
+        /*
+        deverá levar o analisador a proceder à análise lexical e sintática do programa, e apenas caso
+este seja válido, proceder à análise semântica. No caso em que não é passada qualquer opção, o
+analisador deve apenas escrever no stdout as mensagens de erro.
+         */
+
+    }
 
    
     
