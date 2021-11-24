@@ -15,3 +15,5 @@ symtab* create_table(symtab *global, elem *origin);
 elem* create_element(char *id, char *params, char *type, int isFunction);
 void traverseAndPopulateTable(symtab *global);
 void traverseAndCheckTree();
+void printNotedTree(node_t *root, int init_depth);
+void printTables(symtab *global);
