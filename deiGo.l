@@ -36,7 +36,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     int strlit_buffer_alloc_size = 100;
 
     extern node_t *myprogram;
-    extern symtab *global;
+    extern symtab_t *global;
 %}
 
 %X SINGLECOMM DOUBLECOMM STRLIT REALLYEND
@@ -151,7 +151,8 @@ int main(int argc, char *argv[ ])
             // ler árvore + popular tabela
             global = create_global_table();
 
-            traverseAndPopulateTable(global);
+            traverseAndPopulateTable(global, myprogram);
+            printTables(global);
 
             // check arvore + inserir tipos nos nós + consultar tabela
 

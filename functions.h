@@ -10,11 +10,12 @@ void add_next(node_t *node, node_t *next);
 void print_tree(node_t *root, int init_depth);
 int count_children(node_t *first_child);
 
-void insert_element(symtab *table, elem *new);
-symtab* create_table(symtab *global, elem *origin);
-elem* create_element(char *id, char *params, char *type, int isFunction);
-void traverseAndPopulateTable(symtab *global);
+void insert_element(symtab_t *table, elem_t *new);
+symtab_t* create_table(symtab_t *global, elem_t *origin);
+symtab_t* create_global_table();
+elem_t* create_element(char *id, char *params, char *type, int isFunction);
+void traverseAndPopulateTable(symtab_t *global, node_t *program);
 void traverseAndCheckTree();
 void printNotedTree(node_t *root, int init_depth);
-void printTables(symtab *global);
-void printTableElements(elem* element);
+void printTables(symtab_t *global);
+void printTableElements(elem_t * element);

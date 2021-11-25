@@ -13,7 +13,7 @@ node_t *myprogram; // root node
 node_t *temp; // temp node to use as an aux
 int error = 0; // error status flag
 
-symtab *global; // global table
+symtab_t *global; // global table
 
 
 extern char *yytext;
