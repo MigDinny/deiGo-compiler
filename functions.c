@@ -10,7 +10,7 @@ node_t* create_node(char* symbol) {
 	token_t *t = (token_t*) malloc(sizeof(token_t));
 
 	t->symbol = symbol;
-	//n->type = type;
+	n->type = NULL;
 	n->children = NULL;
 	n->next 	= NULL;
 	n->token = t;
@@ -25,7 +25,7 @@ node_t* create_block_node() {
 	token_t *t = (token_t*) malloc(sizeof(token_t));
 
 	t->symbol = "Block";
-	//n->type = type;
+	n->type = NULL;
 	n->children = NULL;
 	n->next 	= NULL;
 	n->token = t;
@@ -175,41 +175,52 @@ void traverseAndCheckTree() {
 
 void printTables(symtab *global){
 
-	if (global->name == NULL && global->params == NULL && global->first_child->type == NULL) printf("==== Global Symbol Table ====\n");
-	else if (global->params == NULL) printf("==== %s %s Symbol Table =====\n", global->name, global->first_child->type);
-	else if (global->first_child->type == NULL) printf("==== %s %s Symbol Table =====\n", global->name, global->params);
-	else printf("==== %s %s %s Symbol Table =====\n", global->name, global->params, global->first_child->type);
+    if (global == NULL) return;
 
-	while (global->next != NULL){
-		printTableElements(global->first_child); 
-		printf("\n"); 
-		printTables(global->next);
-	}
+    if (global->name == NULL && global->params == NULL) printf("==== Global Symbol Table ====\n");
+    else if (global->params == NULL) printf("==== Function %s() Symbol Table =====\n", global->name);
+    else printf("==== Function %s(%s) Symbol Table =====\n", global->name, global->params);
+
+    printTableElements(global->first_child);
+
+    printf("\n"); 
+    printTables(global->next);
 
 }
 
-void printTableElements(elem* element){
+void printTableElements(elem * element){
 
-	while (element != NULL){
-		if (element->params == NULL && element->tparam == NULL) printf("%s\t\t%s", element->id, element->type);
-		else if (element->params == NULL) printf("%s\t\t%s\t%s", element->id, element->type, element->tparam);
-		else if (element->tparam == NULL) printf("%s\t%s\t%s", element->id, element->params, element->type);
-		else printf("%s\t%s\t%s\t%s", element->id, element->params, element->type, element->tparam);
+    if (element == NULL) return;
 
-		printTableElements(element->next);
-	}
+    // tparam = 0 -> não se mete param à frente
+
+    if (element->params == NULL && element->tparam == 0) printf("%s\t\t%s", element->id, element->type);
+    else if (element->params == NULL && element->tparam == 1) printf("%s\t\t%s\tparam", element->id, element->type);
+    else if (element->tparam == 0) printf("%s\t%s\t%s", element->id, element->params, element->type);
+    else printf("%s\t%s\t%s\tparam", element->id, element->params, element->type);
+
+    printTableElements(element->next);
 
 }
 
 void printNotedTree(node_t *root, int init_depth){
-	int depth = init_depth;
 
-	for (int i = 0; i < depth; i++) printf("..");
+    int depth = init_depth;
 
-	if (root->literal == 0) printf("%s\n", root->token->symbol);
-	else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
-	else printf("%s(%s)\n", root->token->symbol, root->token->value);
+    for (int i = 0; i < depth; i++) printf("..");
 
-	if (root->children != NULL) print_tree(root->children, depth+1);
-	if (root->next != NULL) 	print_tree(root->next, depth);
-};
+    if (root->type == NULL){
+        if (root->literal == 0) printf("%s\n", root->token->symbol);
+        else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
+        else printf("%s(%s)\n", root->token->symbol, root->token->value);
+    }
+
+    else {
+        if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->type);
+        else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->type);
+        else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->type);
+    }
+
+    if (root->children != NULL) print_tree(root->children, depth+1);
+    if (root->next != NULL)     print_tree(root->next, depth);
+}
