@@ -17,3 +17,4 @@ void traverseAndPopulateTable(symtab *global);
 void traverseAndCheckTree();
 void printNotedTree(node_t *root, int init_depth);
 void printTables(symtab *global);
+void printTableElements(elem* element);

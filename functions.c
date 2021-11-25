@@ -172,3 +172,44 @@ void traverseAndPopulateTable(symtab *global) {
 void traverseAndCheckTree() {
 	
 }
+
+void printTables(symtab *global){
+
+	if (global->name == NULL && global->params == NULL && global->first_child->type == NULL) printf("==== Global Symbol Table ====\n");
+	else if (global->params == NULL) printf("==== %s %s Symbol Table =====\n", global->name, global->first_child->type);
+	else if (global->first_child->type == NULL) printf("==== %s %s Symbol Table =====\n", global->name, global->params);
+	else printf("==== %s %s %s Symbol Table =====\n", global->name, global->params, global->first_child->type);
+
+	while (global->next != NULL){
+		printTableElements(global->first_child); 
+		printf("\n"); 
+		printTables(global->next);
+	}
+
+}
+
+void printTableElements(elem* element){
+
+	while (element != NULL){
+		if (element->params == NULL && element->tparam == NULL) printf("%s\t\t%s", element->id, element->type);
+		else if (element->params == NULL) printf("%s\t\t%s\t%s", element->id, element->type, element->tparam);
+		else if (element->tparam == NULL) printf("%s\t%s\t%s", element->id, element->params, element->type);
+		else printf("%s\t%s\t%s\t%s", element->id, element->params, element->type, element->tparam);
+
+		printTableElements(element->next);
+	}
+
+}
+
+void printNotedTree(node_t *root, int init_depth){
+	int depth = init_depth;
+
+	for (int i = 0; i < depth; i++) printf("..");
+
+	if (root->literal == 0) printf("%s\n", root->token->symbol);
+	else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
+	else printf("%s(%s)\n", root->token->symbol, root->token->value);
+
+	if (root->children != NULL) print_tree(root->children, depth+1);
+	if (root->next != NULL) 	print_tree(root->next, depth);
+};

@@ -30,6 +30,7 @@ typedef struct elem_t {
 	char *id;
 	char *params;
 	char *type;
+	char *tparam;
 	
 	struct elem_t *next;
 	
