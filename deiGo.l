@@ -27,7 +27,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     #include "functions.h"
     
     int initialLine, initialColumn = 1;
-    int flagL, flagError, flagEOF, flagEOFaux, flagEOF_strlit, flagUseAux, strlit_buffer_pos = 0;
+    int flagL, flagT, flagError, flagEOF, flagEOFaux, flagEOF_strlit, flagUseAux, strlit_buffer_pos = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
     int yycolumnno_aux = 1;
@@ -36,7 +36,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     int strlit_buffer_alloc_size = 100;
 
     extern node_t *myprogram;
-
+    extern symtab *global;
 %}
 
 %X SINGLECOMM DOUBLECOMM STRLIT REALLYEND
@@ -137,13 +137,34 @@ int main(int argc, char *argv[ ])
     
     if (argc > 1) {
         if (strcmp(argv[1], "-l") == 0) {
+            // análise lexical only
             flagL = 1;
             yylex();
         } else if (strcmp(argv[1], "-t") == 0) {
+            flagT = 1;
+            // análise lexical, análise sintatica e PRINT TREE
             yyparse();
-            //print_tree(myprogram, 0);
-        } 
-    } else yyparse();
+        } else if (strcmp(argv[1], "-s") == 0) {
+            // análise lexical, análise sintática e semantica. print tabelas + arvore anotada
+            yyparse();
+
+            // ler árvore + popular tabela
+            global = create_global_table();
+
+            traverseAndPopulateTable(global);
+
+            // check arvore + inserir tipos nos nós + consultar tabela
+
+            traverseAndCheckTree();
+        }
+    } else {
+        /*
+        deverá levar o analisador a proceder à análise lexical e sintática do programa, e apenas caso
+este seja válido, proceder à análise semântica. No caso em que não é passada qualquer opção, o
+analisador deve apenas escrever no stdout as mensagens de erro.
+         */
+
+    }
 
    
     

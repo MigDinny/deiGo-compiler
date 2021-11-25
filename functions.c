@@ -10,7 +10,7 @@ node_t* create_node(char* symbol) {
 	token_t *t = (token_t*) malloc(sizeof(token_t));
 
 	t->symbol = symbol;
-	//n->type = type;
+	n->type = NULL;
 	n->children = NULL;
 	n->next 	= NULL;
 	n->token = t;
@@ -25,7 +25,7 @@ node_t* create_block_node() {
 	token_t *t = (token_t*) malloc(sizeof(token_t));
 
 	t->symbol = "Block";
-	//n->type = type;
+	n->type = NULL;
 	n->children = NULL;
 	n->next 	= NULL;
 	n->token = t;
@@ -93,4 +93,134 @@ int count_children(node_t *first_child) {
 	int n = 0;
 	for (; first_child != NULL; first_child = first_child->next, n++);
 	return n;
+}
+
+
+
+
+/*
+VarDecl
+FuncDecl
+*/
+void insert_element(symtab *table, elem *new) {
+	if (table->first_child == NULL)
+		table->first_child = new;
+	else {
+		elem *last_child = table->first_child;
+		for (; last_child->next != NULL; last_child = last_child->next);
+		
+		last_child->next = new;
+	}
+}
+
+
+symtab* create_table(symtab *global, elem *origin) {
+	symtab *t = (symtab*) malloc(sizeof(symtab));
+	
+	t->name = origin->id;
+	t->params = origin->params;
+	t->first_child = create_element("return", NULL, origin->type, 0);
+	t->next = NULL;
+
+	
+	if (global->next == NULL)
+		global->next = t;
+	else {
+		symtab *last_table = global->next;
+		for (; last_table->next != NULL; last_table = last_table->next);
+		
+		last_table->next = t;
+	}
+	
+
+	return t;
+}
+
+symtab *create_global_table() {
+	symtab *t = (symtab*) malloc(sizeof(symtab));
+
+	t->name = NULL;
+	t->params = NULL;
+	t->first_child = NULL;
+	t->next = NULL;
+
+	return t;
+}
+
+elem* create_element(char *id, char *params, char *type, int isFunction) {
+	elem *e = (elem*) malloc(sizeof(elem));
+	
+	e->id = id;
+
+	if (params == NULL) e->params = "()";
+	else e->params = params;
+
+	if (type == NULL) e->type = "none";
+	else e->type = type;
+
+	e->next = NULL;
+	
+	return e;
+}
+
+
+void traverseAndPopulateTable(symtab *global) {
+
+}
+
+
+void traverseAndCheckTree() {
+	
+}
+
+void printTables(symtab *global){
+
+    if (global == NULL) return;
+
+    if (global->name == NULL && global->params == NULL) printf("==== Global Symbol Table ====\n");
+    else if (global->params == NULL) printf("==== Function %s() Symbol Table =====\n", global->name);
+    else printf("==== Function %s(%s) Symbol Table =====\n", global->name, global->params);
+
+    printTableElements(global->first_child);
+
+    printf("\n"); 
+    printTables(global->next);
+
+}
+
+void printTableElements(elem * element){
+
+    if (element == NULL) return;
+
+    // tparam = 0 -> não se mete param à frente
+
+    if (element->params == NULL && element->tparam == 0) printf("%s\t\t%s", element->id, element->type);
+    else if (element->params == NULL && element->tparam == 1) printf("%s\t\t%s\tparam", element->id, element->type);
+    else if (element->tparam == 0) printf("%s\t%s\t%s", element->id, element->params, element->type);
+    else printf("%s\t%s\t%s\tparam", element->id, element->params, element->type);
+
+    printTableElements(element->next);
+
+}
+
+void printNotedTree(node_t *root, int init_depth){
+
+    int depth = init_depth;
+
+    for (int i = 0; i < depth; i++) printf("..");
+
+    if (root->type == NULL){
+        if (root->literal == 0) printf("%s\n", root->token->symbol);
+        else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
+        else printf("%s(%s)\n", root->token->symbol, root->token->value);
+    }
+
+    else {
+        if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->type);
+        else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->type);
+        else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->type);
+    }
+
+    if (root->children != NULL) print_tree(root->children, depth+1);
+    if (root->next != NULL)     print_tree(root->next, depth);
 }

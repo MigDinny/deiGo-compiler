@@ -2,7 +2,8 @@
 #define STRUCTURES_H
 
 // needs to be completed with all available types
-//typedef enum {PROGRAM, DECLARATION, VARDECLARATION, IF, ELSE} type_e;
+// types: string, bool, int, float32
+typedef enum {INT, BOOL, FLOAT32, STRING} type_e;
 
 // this is a token, with a symbol (ID, FUNC, VARDECL etc) and with an optional value (for intlit, strlit etc)
 typedef struct token {
@@ -19,10 +20,30 @@ typedef struct token {
 typedef struct node {
 	int literal;
 	token_t *token;
-	//type_e type;
+	type_e type;
 	struct node *children;
 	struct node *next;
 } node_t;
 
+
+typedef struct elem_t {
+	
+	char *id;
+	char *params;
+	char *type;
+	int tparam; // bool se tem param ou nao
+	
+	struct elem_t *next;
+	
+} elem;
+
+
+typedef struct symtab_t {
+	char *name; // table name
+	char *params;
+	
+	struct symtab_t *next;
+	struct elem_t   *first_child;
+} symtab;
 
 #endif
