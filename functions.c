@@ -151,7 +151,9 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	elem_t *e = (elem_t*) malloc(sizeof(elem_t));
 	
 	e->id = id;
-
+	e->hits = 0;
+	e->line = 0;
+	e->column = 0;
 	e->params = params;
 
 	if (type == NULL) e->type = "none";
