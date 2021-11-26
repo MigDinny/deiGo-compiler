@@ -323,3 +323,38 @@ void printNotedTree(node_t *root, int init_depth){
     if (root->children != NULL) print_tree(root->children, depth+1);
     if (root->next != NULL)     print_tree(root->next, depth);
 }
+
+/* 
+	Args: 
+		- table to look on
+		- global table reference
+		- id to find
+	
+	Return:
+		- element found
+		- NULL if no element found
+*/
+elem_t* symtab_look(symtab_t *tab, symtab_t *global, char *id) {
+
+}
+
+/*
+	Args:
+		- table to look on
+		- id to find duplicate
+	
+	Return: 
+		- 1 > exists
+		- 0 > does not exist
+*/
+int symtab_find_duplicate(symtab_t *tab, char *id) {
+
+}
+
+/*
+	Args:
+		- table global
+*/
+void throwErrorDeclaredButNeverUsed(symtab_t *global) {
+
+}

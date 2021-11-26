@@ -28,6 +28,8 @@ typedef struct elem {
 	char *params;
 	char *type;
 	int tparam;
+	int hits; // # of times this element was accessed for reading
+	int column, line;
 	
 	struct elem *next;
 	

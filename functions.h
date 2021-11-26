@@ -19,3 +19,7 @@ void traverseAndCheckTree();
 void printNotedTree(node_t *root, int init_depth);
 void printTables(symtab_t *global);
 void printTableElements(elem_t * element);
+
+elem_t* symtab_look(symtab_t *tab, symtab_t *global, char *id);
+int symtab_find_duplicate(symtab_t *tab, char *id);
+void throwErrorDeclaredButNeverUsed(symtab_t *global);
