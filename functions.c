@@ -265,9 +265,31 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 }
 
-
-void traverseAndCheckTree() {
+// CALL traverseAndCheckTree(myprogram);
+char* traverseAndCheckTree(node_t *n) {
 	
+
+	if (strcmp(n->token->symbol, "Id") == 0) {
+		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
+		// note type on tree
+		// return Id type
+	} else if (strcmp(n->token->symbol, "IntLit") == 0) {
+		// note type on tree
+		// return INT type
+	} else if (strcmp(n->token->symbol, "RealLit") == 0) {
+		// note type on tree
+		// return Float32 type
+	} else if (strcmp(n->token->symbol, "StrLit") == 0) {
+		// note type on tree
+		// return string type
+	} else if (strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Eq") == 0) { 
+		// traverseAndCheckTree(first child)
+		// traverseAndCheckTree(second child)
+		// compare if both types are equal. YES >> return type of Sub and note type on tree NO >> throw error
+	} else if (strcmp(n->token->symbol, "Call") == 0) {
+		// type is the returned type of the first child (function)
+	}
+
 }
 
 
