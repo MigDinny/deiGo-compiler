@@ -269,7 +269,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 char* traverseAndCheckTree(node_t *n) {
 	
 	// ignore VarDecl and ParamDecl, 0 annotations and errors are handled outside
-	if (strcmp(n->token->symbol, "VarDecl") || strcmp(n->token->symbol, "ParamDecl") == 0) return; 
+	if (strcmp(n->token->symbol, "VarDecl") || strcmp(n->token->symbol, "ParamDecl") == 0) return ""; 
 
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
@@ -443,6 +443,7 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 
 	//TODO: line, column
 
+	/*
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
 				if (global_aux_element->hits == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", line, column, global_aux_element->id);
@@ -450,4 +451,5 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 		}
 		global_aux = global_aux->next;
 	}
+	*/
 }
