@@ -275,21 +275,35 @@ char* traverseAndCheckTree(node_t *n) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
 		// note type on tree
 		// return Id type
+
 	} else if (strcmp(n->token->symbol, "IntLit") == 0) {
 		// note type on tree
 		// return INT type
+
 	} else if (strcmp(n->token->symbol, "RealLit") == 0) {
 		// note type on tree
 		// return Float32 type
+
 	} else if (strcmp(n->token->symbol, "StrLit") == 0) {
 		// note type on tree
 		// return string type
-	} else if (strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Eq") == 0) { 
+
+	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 
+	|| strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0) { 
 		// traverseAndCheckTree(first child)
 		// traverseAndCheckTree(second child)
 		// compare if both types are equal. YES >> return type of Sub and note type on tree NO >> throw error
+
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		// type is the returned type of the first child (function)
+
+	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0  || strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 
+	|| strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+		// return bool type (compares two tokens)
+
+	} else if (strcmp(n->token->symbol, "Not") == 0){
+		// return bool type (only one token)
+		// -> NÃO TENHO A CERTEZA QUANTO A ESTE pq não há casos de teste suficientes que mostrem um<-
 	}
 
 }
@@ -360,8 +374,38 @@ void printNotedTree(node_t *root, int init_depth){
 		- element found
 		- NULL if no element found
 */
-elem_t* symtab_look(symtab_t *tab, symtab_t *global, char *id) {
+elem_t* symtab_look(char *tabname, symtab_t *global, char *id) {
+	
+	symtab_t * global_aux = global;	
+	symtab_t * func_aux = global_aux->next;		
+	elem_t * global_aux_element = global->first_element;									
+	elem_t * func_aux_element = func_aux->first_element;
 
+	while (strcmp(func_aux->name, tabname) != 0){
+		func_aux = func_aux->next;
+	}
+
+	// se não há tabela de função, percorre a global
+	if (func_aux == NULL){															
+		while (global_aux_element != NULL) {
+			if ((strcmp(global_aux_element->id, id) != 0)) global_aux_element = global_aux_element->next;
+			else if (strcmp(global_aux_element->id, id) == 0) return global_aux_element;
+		}
+		return NULL;
+	}
+
+	// percorre a tabela de função
+	else {
+		while (func_aux_element != NULL) {
+			if (strcmp(func_aux_element->id, id) != 0) func_aux_element = func_aux_element->next;
+			else if (strcmp(func_aux_element->id, id) == 0) return func_aux_element;
+		}
+		while (global_aux_element != NULL) {
+			if ((strcmp(global_aux_element->id, id) != 0)) global_aux_element = global_aux_element->next;
+			else if (strcmp(global_aux_element->id, id) == 0) return global_aux_element;
+		}
+		return NULL;
+	}	
 }
 
 /*
@@ -374,13 +418,36 @@ elem_t* symtab_look(symtab_t *tab, symtab_t *global, char *id) {
 		- 0 > does not exist
 */
 int symtab_find_duplicate(symtab_t *tab, char *id) {
+		
+	symtab_t * func_aux = tab;													
+	elem_t * func_aux_element = func_aux->first_element;
 
+	if (func_aux == NULL) return 0;													
+	else {
+		while (func_aux_element != NULL) {
+			if (strcmp(func_aux_element->id, id) != 0) func_aux_element = func_aux_element->next;
+			else if (strcmp(func_aux_element->id, id) == 0) return 1;
+		}
+		return 0;
+	}
 }
 
 /*
 	Args:
 		- table global
 */
-void throwErrorDeclaredButNeverUsed(symtab_t *global) {
+void throwErrorDeclaredButNeverUsed(symtab_t *global) {		
 
+	symtab_t * global_aux = global;
+	elem_t * global_aux_element = global->first_element;
+
+	//TODO: line, column
+
+	while (global_aux != NULL){
+			while (global_aux_element != NULL) {
+				if (global_aux_element->hits == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", line, column, global_aux_element->id);
+				global_aux_element = global_aux_element->next;
+		}
+		global_aux = global_aux->next;
+	}
 }
