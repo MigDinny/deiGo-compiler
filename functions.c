@@ -268,6 +268,8 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 // CALL traverseAndCheckTree(myprogram);
 char* traverseAndCheckTree(node_t *n) {
 	
+	// ignore VarDecl and ParamDecl, 0 annotations and errors are handled outside
+	if (strcmp(n->token->symbol, "VarDecl") || strcmp(n->token->symbol, "ParamDecl") == 0) return; 
 
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
