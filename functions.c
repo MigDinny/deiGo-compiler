@@ -405,6 +405,17 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// no need to set noted_type
 		return NULL;
+	} else if (strcmp(n->token->symbol, "For") == 0 || strcmp(n->token->symbol, "If") == 0) {
+		// process children first
+		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
+		// expression inside FOR and IF must be BOOL
+		if (strcmp(n->children->noted_type, "bool") != 0) {
+			// TODO: 5 - Incompatible type < type > in < token > statement
+		}
+
+		// return NULL anyways, because FOR doesn't have any noted_type
+		return NULL;
 	} else {
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
