@@ -348,8 +348,6 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		// call recursively on params first
 		for (; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
-
-		// TODO: 6 - check call params against declared params
 		
 		// check each parameter against declared parameters
 		char *substring = (char *) malloc(strlen(look->params));
