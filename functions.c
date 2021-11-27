@@ -332,10 +332,18 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "undef";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
+		// check if ID exists
+		// TODO: 6 - check call params against declared params
+		elem_t *look = symtab_look(tabname, global, n->children->token->value);
+		if (look == NULL) {
+			// ERROR NOT DEFINED
+			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, n->token->value);
+			n->noted_type = "undef";
+			return "undef";
+		}
+		
 		// type is the returned type of the first child (function)
-
-		n->noted_type = "call";
-		// return string type
+		n->noted_type = look->type;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
