@@ -403,8 +403,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		if (errors > 0) {
-			// TODO: 7 - cannot find symbol function(params)
-			//printf("<< errors: %d >> <<%s>>", errors, called_parameters_buffer + 2);
+			// TODO: 7 - cannot find symbol function(params)  ======================> É SÓ USARES O PRINT ABAIXO E METERES DE ACORDO COM O Q ESTÁ NO OUPUT CORRETO. MANTÉM O +2 Q LÁ ESTA, É IMPORTANTE
 			printf("Cannot find symbol %s(%s)\n", look->id, called_parameters_buffer + 2);
 		}
 
