@@ -16,7 +16,7 @@ symtab_t* create_global_table();
 elem_t* create_element(char *id, char *params, char *type, int isFunction);
 void traverseAndPopulateTable(symtab_t *global, node_t *program);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global);
-void printNotedTree(node_t *root, int init_depth);
+void printNotedTree(node_t *root, int init_depth, symtab_t *global);
 void printTables(symtab_t *global);
 void printTableElements(elem_t * element);
 
