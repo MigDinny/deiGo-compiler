@@ -233,7 +233,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			for (; params_node != NULL; params_node = params_node->next) {
 				// len params + len next param + 3 chars (comma, space, closing parenthesis)
 				if (strlen(params_buffer) + strlen(params_node->children->token->symbol) + 3  >=  params_buffer_alloc_size-1) {
-					params_buffer = (char *) realloc(params_buffer, 10);
+					params_buffer = (char *) realloc(params_buffer, params_buffer_alloc_size + 10);
 					params_buffer_alloc_size += 10;
 				}
 
