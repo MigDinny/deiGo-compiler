@@ -157,7 +157,7 @@ int main(int argc, char *argv[ ])
             // check arvore + inserir tipos nos nós + consultar tabela
 
             traverseAndCheckTree(myprogram, NULL, global);
-            printNotedTree(myprogram, 0);
+            printNotedTree(myprogram, 0, global);
         }
     } else {
         /*
