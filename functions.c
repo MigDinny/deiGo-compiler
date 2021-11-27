@@ -221,12 +221,14 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			// building + allocation
 			char *params_buffer = NULL;
 			params_buffer = (char*) malloc(10);
+			params_buffer[0] = 0;
 			int params_buffer_alloc_size = 10;	
 
 			if (params_node == NULL)
 				sprintf(params_buffer, "(");
 			else {
 				sprintf(params_buffer, "(%s", toLowerFirstChar(params_node->children->token->symbol));
+
 				params_node = params_node->next;
 			}
 			
@@ -332,16 +334,80 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "undef";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
-		// check if ID exists
-		// TODO: 6 - check call params against declared params
-		elem_t *look = symtab_look(tabname, global, n->children->token->value);
+		node_t *first_child = n->children;
+
+		elem_t *look = symtab_look(tabname, global, first_child->token->value);
 		if (look == NULL) {
 			// ERROR NOT DEFINED
-			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, n->token->value);
+			// TODO: 8 - also print params
+			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, first_child->token->value);
 			n->noted_type = "undef";
 			return "undef";
 		}
+
+		// call recursively on params first
+		for (; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
+
+		// TODO: 6 - check call params against declared params
 		
+		// check each parameter against declared parameters
+		char *substring = (char *) malloc(strlen(look->params));
+		substring[0] = 0;
+		strncpy(substring, look->params + 1, strlen(look->params)-2);
+
+		char *declared_param = strtok(substring, ", ");
+		node_t *param_node = n->children->next; // first parameter called
+
+		int errors = 0;
+
+		char *called_parameters_buffer = (char *) malloc(20);
+		called_parameters_buffer[0] = 0;
+		int called_parameters_buffer_alloc_size = 20;
+
+		while (declared_param != NULL) {
+			// number of called params and declared params dont match
+			if (param_node == NULL) { errors++; break;}
+
+			// parameter types and declared parameter types dont match
+			if ( strcmp(param_node->noted_type, declared_param) != 0 ) { errors++; }
+
+			// append to called_parameters_buffer the noted_type
+			
+			// check if needs realloc
+			if (strlen(called_parameters_buffer) + strlen(param_node->noted_type) + 3 >= called_parameters_buffer_alloc_size - 1) {
+				called_parameters_buffer = (char *) realloc(called_parameters_buffer, called_parameters_buffer_alloc_size + 20);
+				called_parameters_buffer_alloc_size += 20;
+			}
+			
+			sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ", %s", param_node->noted_type);
+		
+			param_node = param_node->next; 
+			declared_param = strtok(NULL, ", ");
+		}
+		
+		if (param_node != NULL) {
+			errors++;
+
+			while (param_node != NULL) {
+				// check if needs realloc
+				if (strlen(called_parameters_buffer) + strlen(param_node->noted_type) + 3 >= called_parameters_buffer_alloc_size - 1) {
+					called_parameters_buffer = (char *) realloc(called_parameters_buffer, called_parameters_buffer_alloc_size + 20);
+					called_parameters_buffer_alloc_size += 20;
+				}
+				
+				sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ", %s", param_node->noted_type);
+
+				param_node = param_node->next;
+			}
+		}
+
+		if (errors > 0) {
+			// TODO: 7 - cannot find symbol function(params)
+			//printf("<< errors: %d >> <<%s>>", errors, called_parameters_buffer + 2);
+			printf("Cannot find symbol %s(%s)\n", look->id, called_parameters_buffer + 2);
+		}
+
 		// type is the returned type of the first child (function)
 		n->noted_type = look->type;
 		return n->noted_type;
@@ -499,36 +565,34 @@ void printNotedTree(node_t *root, int init_depth){
 */
 elem_t* symtab_look(char *tabname, symtab_t *global, char *id) {
 	
-	symtab_t * global_aux = global;	
-	symtab_t * func_aux = global_aux->next;		
-	elem_t * global_aux_element = global->first_element;									
-	elem_t * func_aux_element = func_aux->first_element;
+	symtab_t *func = global->next;
+	elem_t *found;
 
-	while (strcmp(func_aux->name, tabname) != 0){
-		func_aux = func_aux->next;
+	while (func != NULL) {
+		if (strcmp(func->name, tabname) == 0) break;
+		func = func->next;
 	}
 
-	// se não há tabela de função, percorre a global
-	if (func_aux == NULL){															
-		while (global_aux_element != NULL) {
-			if ((strcmp(global_aux_element->id, id) != 0)) global_aux_element = global_aux_element->next;
-			else if (strcmp(global_aux_element->id, id) == 0) return global_aux_element;
-		}
-		return NULL;
+	if (func == NULL) return NULL; // appears to be element not found but in reality is func not found. should raise some kind of exception, because this shouldnt never happen. 
+
+	found = func->first_element;
+
+	while (found != NULL) {
+		if (strcmp(found->id, id) == 0) break;
+		found = found->next;
 	}
 
-	// percorre a tabela de função
-	else {
-		while (func_aux_element != NULL) {
-			if (strcmp(func_aux_element->id, id) != 0) func_aux_element = func_aux_element->next;
-			else if (strcmp(func_aux_element->id, id) == 0) return func_aux_element;
-		}
-		while (global_aux_element != NULL) {
-			if ((strcmp(global_aux_element->id, id) != 0)) global_aux_element = global_aux_element->next;
-			else if (strcmp(global_aux_element->id, id) == 0) return global_aux_element;
-		}
-		return NULL;
-	}	
+	if (found != NULL) return found; // element found
+
+	found = global->first_element;
+
+	while (found != NULL) {
+		if (strcmp(found->id, id) == 0) break;
+		found = found->next;
+	}
+
+	return found; // will return NULL if not found in global, will return the element if it is found
+
 }
 
 /*
