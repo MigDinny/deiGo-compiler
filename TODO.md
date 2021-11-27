@@ -1,17 +1,16 @@
-## META 2
+## META 3
 
 Questions:
 
-[ ] - question page 9: what does FuncDecl(2) mean? should we ignore FuncDecl's with less than 2 children? should we throw a syntax error when children number requirements are not met?
 
 Todo:
 
-M [x] - create propper grammar based on given pseudo-grammar
-A [x] - change lex file to return tokens (example: RETURN ID) for yacc to interpret
-AM [x] - alter grammar so it is functional based on given requirements (page 7)
-A [x] - sort the associativities (%left, %right, %nonassoc ...)
-[x] - create structs and functions to handle AST
-M [ ] - call create_node() and add_child() accordingly, in each grammar production
-[ ] - handle redundancy (page 9)
+Erros
 
-[ ] - error handling + lines and columns + final adjustments of the output
+[ ] - TODO: 3 - Symbol < token > already defined
+[ ] - TODO: 1 - Cannot find symbol < token >
+[ ] - Operator < token > cannot be applied to type < type >
+[ ] - Operator < token > cannot be applied to types < type > , <type >
+[ ] - Incompatible type < type > in < token > statement
+[ ] - TODO: 2 - Symbol < token > declared but never used
+

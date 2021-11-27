@@ -103,6 +103,11 @@ VarDecl
 FuncDecl
 */
 void insert_element(symtab_t *table, elem_t *new) {
+	if (symtab_find_duplicate(table, new->id) == 1) {
+		// throw error ALREADY EXISTS
+		// TODO: 3 - already defined
+	}
+
 	if (table->first_element == NULL)
 		table->first_element = new;
 	else {
@@ -157,7 +162,7 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	e->params = params;
 
 	if (type == NULL) e->type = "none";
-	else e->type = type;
+	else e->type = (char*) toLowerFirstChar(type);
 
 	e->next = NULL;
 	
@@ -180,6 +185,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			// VARDECL: 1st child > type    2nd child > id
 			char *id = current_node->children->next->token->value;
 			char *type = current_node->children->token->symbol;
+
 			elem_t *new = create_element(id, NULL, type, 0);
 
 			insert_element(tab, new);
@@ -217,7 +223,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			if (params_node == NULL)
 				sprintf(params_buffer, "(");
 			else {
-				sprintf(params_buffer, "(%s", params_node->children->token->symbol);
+				sprintf(params_buffer, "(%s", toLowerFirstChar(params_node->children->token->symbol));
 				params_node = params_node->next;
 			}
 			
@@ -227,7 +233,8 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 					params_buffer = (char *) realloc(params_buffer, 10);
 					params_buffer_alloc_size += 10;
 				}
-				sprintf(params_buffer + strlen(params_buffer), ", %s", params_node->children->token->symbol);
+
+				sprintf(params_buffer + strlen(params_buffer), ", %s", toLowerFirstChar(params_node->children->token->symbol));
 			}
 
 			sprintf(params_buffer + strlen(params_buffer), ")");
@@ -265,45 +272,71 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 }
 
-// CALL traverseAndCheckTree(myprogram);
-char* traverseAndCheckTree(node_t *n) {
-	
-	// ignore VarDecl and ParamDecl, 0 annotations and errors are handled outside
-	if (strcmp(n->token->symbol, "VarDecl") || strcmp(n->token->symbol, "ParamDecl") == 0) return ""; 
+// CALL traverseAndCheckTree(myprogram, NULL, global);
+char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
+	// nodes to be ignored and stop child processing!
+	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) return NULL; 
 
+	
+
+	// specific nodes which require specific actions 
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
+		elem_t *look = symtab_look(tabname, global, n->token->value);
+		if (look == NULL) {
+			// ERROR NOT DEFINED
+			// TODO: 1 - throw not defined error
+			n->noted_type = "undef";
+			return "undef";
+		}
+
 		// note type on tree
+		n->noted_type = look->type;
+
 		// return Id type
-
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "IntLit") == 0) {
+		
 		// note type on tree
+		n->noted_type = "int";
+		
 		// return INT type
-
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "RealLit") == 0) {
 		// note type on tree
+		n->noted_type = "float32";
 		// return Float32 type
-
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "StrLit") == 0) {
 		// note type on tree
+		n->noted_type = "string";
 		// return string type
-
-	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 
-	|| strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0) { 
-		// traverseAndCheckTree(first child)
-		// traverseAndCheckTree(second child)
+		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
 		// compare if both types are equal. YES >> return type of Sub and note type on tree NO >> throw error
 
+		n->noted_type = "operation";
+		// return string type
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		// type is the returned type of the first child (function)
 
-	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0  || strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 
-	|| strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+		n->noted_type = "call";
+		// return string type
+		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0  || strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// return bool type (compares two tokens)
-
-	} else if (strcmp(n->token->symbol, "Not") == 0){
+	} else if (strcmp(n->token->symbol, "Not") == 0) {
 		// return bool type (only one token)
 		// -> NÃO TENHO A CERTEZA QUANTO A ESTE pq não há casos de teste suficientes que mostrem um<-
+	} else {
+		// it's not a NOTED NODE AND does not require any specific action
+		// but needs to process its children
+		// if this node is FuncDecl, change tab reference to this function's table
+		if (strcmp(n->token->symbol, "FuncDecl") == 0) tabname = n->children->children->token->value;
+		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 	}
 
 }
@@ -348,20 +381,25 @@ void printNotedTree(node_t *root, int init_depth){
 
     for (int i = 0; i < depth; i++) printf("..");
 
+	//printf(":%s:", root->token->symbol);
+	//if (root->noted_type == NULL) printf(":NULL:");
+
     if (root->noted_type == NULL){
         if (root->literal == 0) printf("%s\n", root->token->symbol);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
         else printf("%s(%s)\n", root->token->symbol, root->token->value);
-    }
+    } else {
 
-    else {
         if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->noted_type);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type);
+		
+		
+		//printf(":::%s:::", root->noted_type);
     }
 
-    if (root->children != NULL) print_tree(root->children, depth+1);
-    if (root->next != NULL)     print_tree(root->next, depth);
+    if (root->children != NULL) printNotedTree(root->children, depth+1);
+    if (root->next != NULL)     printNotedTree(root->next, depth);
 }
 
 /* 
@@ -441,7 +479,7 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 	symtab_t * global_aux = global;
 	elem_t * global_aux_element = global->first_element;
 
-	//TODO: line, column
+	//TODO: 2 - line, column
 
 	/*
 	while (global_aux != NULL){
@@ -452,4 +490,10 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 		global_aux = global_aux->next;
 	}
 	*/
+}
+
+char * toLowerFirstChar(char *s) {
+	char *sdup = strdup(s);
+	if (s[0] >= 65 && s[0] <= 90) sdup[0] += 32;
+	return sdup;
 }
