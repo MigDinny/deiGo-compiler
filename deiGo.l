@@ -154,10 +154,6 @@ int main(int argc, char *argv[ ])
             traverseAndPopulateTable(global, myprogram);
             printTables(global);
 
-            char * factorialc = "factorial";
-            char * symbol = "n";
-            printf("THIS WILL BE PRINTED IF THERE'S A SYMBOL FOUND: %s\n", symtab_look(factorialc, global, symbol)->id);
-
             // check arvore + inserir tipos nos nós + consultar tabela
 
             traverseAndCheckTree(myprogram, NULL, global);
