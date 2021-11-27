@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
-extern yycolumnno_aux;
-extern yylineno_aux;
+extern int yycolumnno_aux;
+extern int yylineno_aux;
 
 node_t* create_node(char* symbol) {
 
