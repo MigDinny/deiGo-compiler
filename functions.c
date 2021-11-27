@@ -327,7 +327,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// the types dont meet the above requirements
-		// TODO: 4 - operator + - / *   cannot be applited to types type1, type2
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
@@ -357,7 +357,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are not INT or FLOAT32, throw error
-		// TODO: 4 - operator < <= ... cannot be applied to type1, type2
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
@@ -374,7 +374,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are NOT bool, throw error
-		// TODO: 4 - operator && or || cannot be applied to types type1, type2
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
 		n->noted_type = "undef";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Not") == 0) {
@@ -388,7 +388,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// child is not bool
-		// TODO: 4 - Operator ! cannot be applied to type type1
+		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1);
 		n->noted_type = "undef";
 		return n->noted_type;
 
@@ -400,7 +400,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// the types are not equal, throw error
 		if (strcmp(type1, type2) != 0) {
-			// TODO: 4 - Operator = cannot be applied to types type1, type2
+			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
 		}
 
 		// no need to set noted_type
