@@ -449,7 +449,7 @@ void printTableElements(elem_t * element){
 }
 
 
-void printNotedTree(node_t *root, int init_depth){
+void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 
     int depth = init_depth;
 
@@ -466,14 +466,23 @@ void printNotedTree(node_t *root, int init_depth){
 
         if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->noted_type);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
-        else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type);
-		
-		
+        else { // é literal
+			if (strcmp(root->token->symbol, "Id") == 0){
+				elem_t * look = symtab_look(NULL, global, root->token->value);
+				if (look == NULL) printf("%s(%s) - undef\n", root->token->symbol, root->token->value);
+				else {
+					if (look->params == NULL) printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type); // é variável
+					else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, look->params);						  // é funcao
+				}
+			}
+			else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type);
+			
+		}
 		//printf(":::%s:::", root->noted_type);
     }
 
-    if (root->children != NULL) printNotedTree(root->children, depth+1);
-    if (root->next != NULL)     printNotedTree(root->next, depth);
+    if (root->children != NULL) printNotedTree(root->children, depth+1, global);
+    if (root->next != NULL)     printNotedTree(root->next, depth, global);
 }
 
 /* 
