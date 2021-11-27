@@ -316,12 +316,20 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		// return string type
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
+		// both types must be equal and must be INT or FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
-		// compare if both types are equal. YES >> return type of Sub and note type on tree NO >> throw error
+		
+		if ( (strcmp(type1, "int") == 0 && strcmp(type2, "int") == 0) || (strcmp(type1, "float32") == 0 && strcmp(type2, "float32") == 0) ) {
+			// INT-INT or FLOAT-FLOAT	
+			n->noted_type = type1;
+			return n->noted_type;
+		}
 
-		n->noted_type = "operation";
-		// return string type
+		// the types dont meet the above requirements
+		// TODO: 4 - operator + - / *   cannot be applited to types type1, type2
+
+		n->noted_type = "undef";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		// type is the returned type of the first child (function)
@@ -329,11 +337,66 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "call";
 		// return string type
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0  || strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
-		// return bool type (compares two tokens)
+	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+		// these require to be BOTH INT or BOTH FLOAT32
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+	
+		if (  (strcmp(type1, "int") == 0 && strcmp(type2, "int") == 0)  || (strcmp(type1, "float32") == 0 && strcmp(type2, "float32") == 0) ) {
+			// both types are int
+			n->noted_type = "bool";
+			return n->noted_type;
+		}
+
+		// both types are not INT or FLOAT32, throw error
+		// TODO: 4 - operator < <= ... cannot be applied to type1, type2
+
+		n->noted_type = "undef";
+		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0 ) {
+		// OR and AND require both children to be BOOL
+
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+
+		if (strcmp(type1, "bool") == 0 && strcmp(type2, "bool") == 0) {
+			// both types are BOOL, proceed
+			n->noted_type = "bool";
+			return n->noted_type;
+		}
+
+		// both types are NOT bool, throw error
+		// TODO: 4 - operator && or || cannot be applied to types type1, type2
+		n->noted_type = "undef";
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Not") == 0) {
-		// return bool type (only one token)
-		// -> NÃO TENHO A CERTEZA QUANTO A ESTE pq não há casos de teste suficientes que mostrem um<-
+		// the only child must be bool
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		
+		// child is bool
+		if (strcmp(type1, "bool") == 0) {
+			n->noted_type = "bool";
+			return n->noted_type;
+		}
+
+		// child is not bool
+		// TODO: 4 - Operator ! cannot be applied to type type1
+		n->noted_type = "undef";
+		return n->noted_type;
+
+	} else if (strcmp(n->token->symbol, "Assign") == 0) {
+		// assigned type must be the same as the variable's type receiving the value
+		
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+
+		// the types are not equal, throw error
+		if (strcmp(type1, type2) != 0) {
+			// TODO: 4 - Operator = cannot be applied to types type1, type2
+		}
+
+		// no need to set noted_type
+		return NULL;
 	} else {
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
