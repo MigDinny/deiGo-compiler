@@ -475,9 +475,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
 		// expression inside FOR and IF must be BOOL
-		if (strcmp(n->children->noted_type, "bool") != 0) {
-			// TODO: 5 - Incompatible type < type > in < token > statement
-		}
+		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", yylineno_aux, yycolumnno_aux, n->children->noted_type, n->children->token->symbol);
 
 		// return NULL anyways, because FOR doesn't have any noted_type
 		return NULL;
