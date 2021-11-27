@@ -4,6 +4,9 @@
 #include <string.h>
 #include <stdio.h>
 
+extern yycolumnno_aux;
+extern yylineno_aux;
+
 node_t* create_node(char* symbol) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
@@ -105,7 +108,7 @@ FuncDecl
 void insert_element(symtab_t *table, elem_t *new) {
 	if (symtab_find_duplicate(table, new->id) == 1) {
 		// throw error ALREADY EXISTS
-		// TODO: 3 - already defined
+		printf("Line %d, column %d: Symbol %s already defined\n", yylineno_aux, yycolumnno_aux, new->id);
 	}
 
 	if (table->first_element == NULL)
@@ -285,7 +288,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		elem_t *look = symtab_look(tabname, global, n->token->value);
 		if (look == NULL) {
 			// ERROR NOT DEFINED
-			// TODO: 1 - throw not defined error
+			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, n->token->value);
 			n->noted_type = "undef";
 			return "undef";
 		}
@@ -478,18 +481,15 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 
 	symtab_t * global_aux = global;
 	elem_t * global_aux_element = global->first_element;
-
-	//TODO: 2 - line, column
-
-	/*
+	
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
-				if (global_aux_element->hits == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", line, column, global_aux_element->id);
+				if (global_aux_element->hits == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", yylineno_aux, yycolumnno_aux, global_aux_element->id);
 				global_aux_element = global_aux_element->next;
 		}
 		global_aux = global_aux->next;
 	}
-	*/
+	
 }
 
 char * toLowerFirstChar(char *s) {
