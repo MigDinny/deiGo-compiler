@@ -37,6 +37,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 
     extern node_t *myprogram;
     extern symtab_t *global;
+    int error2;
 %}
 
 %X SINGLECOMM DOUBLECOMM STRLIT REALLYEND
@@ -147,17 +148,20 @@ int main(int argc, char *argv[ ])
         } else if (strcmp(argv[1], "-s") == 0) {
             // análise lexical, análise sintática e semantica. print tabelas + arvore anotada
             yyparse();
+            
+            if (error2 == 0) {
+                printf("HERE");
+                // ler árvore + popular tabela
+                global = create_global_table();
 
-            // ler árvore + popular tabela
-            global = create_global_table();
+                traverseAndPopulateTable(global, myprogram);
+                printTables(global);
 
-            traverseAndPopulateTable(global, myprogram);
-            printTables(global);
+                // check arvore + inserir tipos nos nós + consultar tabela
 
-            // check arvore + inserir tipos nos nós + consultar tabela
-
-            traverseAndCheckTree(myprogram, NULL, global);
-            printNotedTree(myprogram, 0, global);
+                traverseAndCheckTree(myprogram, NULL, global);
+                printNotedTree(myprogram, 0, global);
+            }
         }
     } else {
         /*
@@ -180,6 +184,7 @@ int yywrap() {
 }
 
 void yyerror (const char *s) {
+    error2 += 1;
     if (strcmp(yytext, "\"") == 0) {
         // syntax error: "
         printf ("Line %d, column %d: %s: \"%s\"\n", yylineno, yycolumnno - (int) strlen(yylval.letters) - 2, s, yylval.letters);
