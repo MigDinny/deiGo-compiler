@@ -150,7 +150,6 @@ int main(int argc, char *argv[ ])
             yyparse();
             
             if (error2 == 0) {
-                printf("HERE");
                 // ler árvore + popular tabela
                 global = create_global_table();
 

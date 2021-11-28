@@ -335,7 +335,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		node_t *first_child = n->children;
-
+	
 		// call recursively on params first
 		for (first_child = first_child->next; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
@@ -361,12 +361,14 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 
-
+	
 		
 		// check each parameter against declared parameters
 		char *substring = (char *) malloc(strlen(look->params));
 		substring[0] = 0;
 		strncpy(substring, look->params + 1, strlen(look->params)-2);
+
+		
 
 		char *declared_param = strtok(substring, ", ");
 		node_t *param_node = n->children->next; // first parameter called
@@ -414,9 +416,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			}
 		}
 
+		// TODO: 1
 		if (errors > 0) {
-			printf("Cannot find symbol %s(%s)\n", param_node->token->value, called_parameters_buffer + 2);
+			printf("Cannot find symbol %s(%s)\n", n->children->next->token->value, called_parameters_buffer + 2);
 		}
+
 
 		// type is the returned type of the first child (function)
 		n->noted_type = look->type;
