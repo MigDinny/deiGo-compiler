@@ -336,17 +336,31 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		node_t *first_child = n->children;
 
+		// call recursively on params first
+		for (first_child = first_child->next; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
+		first_child = n->children;
+
 		elem_t *look = symtab_look(tabname, global, first_child->token->value);
 		if (look == NULL) {
 			// ERROR NOT DEFINED
-			// TODO: 8 - also print params
-			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, first_child->token->value);
+			first_child = n->children;
+			first_child->noted_type = "undef";
+			printf("Line %d, column %d: Cannot find symbol %s(", yylineno_aux, yycolumnno_aux, first_child->token->value);
+			first_child = n->children->next;
+
+			for (; first_child != NULL; first_child = first_child->next) {
+				if (first_child->next == NULL) printf("%s", first_child->noted_type);
+				else printf("%s,", first_child->noted_type);
+			}
+
+			printf(")\n");
+
 			n->noted_type = "undef";
 			return "undef";
 		}
 
-		// call recursively on params first
-		for (; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
 
 		
 		// check each parameter against declared parameters
@@ -526,15 +540,11 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 
     for (int i = 0; i < depth; i++) printf("..");
 
-	//printf(":%s:", root->token->symbol);
-	//if (root->noted_type == NULL) printf(":NULL:");
-
     if (root->noted_type == NULL){
         if (root->literal == 0) printf("%s\n", root->token->symbol);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
         else printf("%s(%s)\n", root->token->symbol, root->token->value);
     } else {
-
         if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->noted_type);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else { // é literal
@@ -549,7 +559,6 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 			else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type);
 			
 		}
-		//printf(":::%s:::", root->noted_type);
     }
 
     if (root->children != NULL) printNotedTree(root->children, depth+1, global);
@@ -570,22 +579,24 @@ elem_t* symtab_look(char *tabname, symtab_t *global, char *id) {
 	
 	symtab_t *func = global->next;
 	elem_t *found;
+	
+	if (tabname != NULL) {
+		while (func != NULL) {
+			if (strcmp(func->name, tabname) == 0) break;
+			func = func->next;
+		}
 
-	while (func != NULL) {
-		if (strcmp(func->name, tabname) == 0) break;
-		func = func->next;
+		if (func == NULL) return NULL; // appears to be element not found but in reality is func not found. should raise some kind of exception, because this shouldnt never happen. 
+
+		found = func->first_element;
+
+		while (found != NULL) {
+			if (strcmp(found->id, id) == 0) break;
+			found = found->next;
+		}
+
+		if (found != NULL) return found; // element found
 	}
-
-	if (func == NULL) return NULL; // appears to be element not found but in reality is func not found. should raise some kind of exception, because this shouldnt never happen. 
-
-	found = func->first_element;
-
-	while (found != NULL) {
-		if (strcmp(found->id, id) == 0) break;
-		found = found->next;
-	}
-
-	if (found != NULL) return found; // element found
 
 	found = global->first_element;
 
