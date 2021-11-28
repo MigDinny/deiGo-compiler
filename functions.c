@@ -509,6 +509,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 	}
 
+	// we may never get here, but if we do, we have a problem...
+	return NULL;
 }
 
 
