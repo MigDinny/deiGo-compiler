@@ -289,6 +289,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
 		elem_t *look = symtab_look(tabname, global, n->token->value);
+		n->funcTabName = tabname;
+		
 		if (look == NULL) {
 			// ERROR NOT DEFINED
 			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, n->token->value);
@@ -298,7 +300,6 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// note type on tree
 		n->noted_type = look->type;
-
 		// return Id type
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "IntLit") == 0) {
@@ -559,7 +560,8 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else { // é literal
 			if (strcmp(root->token->symbol, "Id") == 0){
-				elem_t * look = symtab_look(NULL, global, root->token->value);
+				elem_t * look = symtab_look(root->funcTabName, global, root->token->value);
+				
 				if (look == NULL) printf("%s(%s) - undef\n", root->token->symbol, root->token->value);
 				else {
 					if (look->printFuncParams == 0) printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type); // é variável
@@ -586,7 +588,6 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 		- NULL if no element found
 */
 elem_t* symtab_look(char *tabname, symtab_t *global, char *id) {
-	
 	symtab_t *func = global->next;
 	elem_t *found;
 	
