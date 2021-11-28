@@ -2,6 +2,7 @@
 
 Questions:
 
+1 - Se houver erros, printa-se a árvore? Enunciado diz que sim, errors.out diz que não
 
 Todo:
 

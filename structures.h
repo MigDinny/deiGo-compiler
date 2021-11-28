@@ -30,7 +30,8 @@ typedef struct elem {
 	int tparam;
 	int hits; // # of times this element was accessed for reading
 	int column, line;
-	
+	int printFuncParams;
+
 	struct elem *next;
 	
 } elem_t;

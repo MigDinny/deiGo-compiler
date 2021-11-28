@@ -163,7 +163,8 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	e->line = 0;
 	e->column = 0;
 	e->params = params;
-
+	e->printFuncParams = 0;
+	
 	if (type == NULL) e->type = "none";
 	else e->type = (char*) toLowerFirstChar(type);
 
@@ -357,10 +358,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			printf(")\n");
 
 			n->noted_type = "undef";
+			n->children->noted_type = "undef";
 			return "undef";
 		}
 
-
+		look->printFuncParams = 1;
 	
 		
 		// check each parameter against declared parameters
@@ -419,11 +421,15 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		// TODO: 1
 		if (errors > 0) {
 			printf("Cannot find symbol %s(%s)\n", n->children->next->token->value, called_parameters_buffer + 2);
+			n->noted_type = "undef";
+			n->children->noted_type = "undef";
+			return "undef";
 		}
 
-
+		
 		// type is the returned type of the first child (function)
 		n->noted_type = look->type;
+		n->children->noted_type = look->type;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
@@ -556,7 +562,7 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 				elem_t * look = symtab_look(NULL, global, root->token->value);
 				if (look == NULL) printf("%s(%s) - undef\n", root->token->symbol, root->token->value);
 				else {
-					if (look->params == NULL) printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type); // é variável
+					if (look->printFuncParams == 0) printf("%s(%s) - %s\n", root->token->symbol, root->token->value, root->noted_type); // é variável
 					else printf("%s(%s) - %s\n", root->token->symbol, root->token->value, look->params);						  // é funcao
 				}
 			}
