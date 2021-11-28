@@ -419,9 +419,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			}
 		}
 
-		// TODO: 1
 		if (errors > 0) {
-			printf("Cannot find symbol %s(%s)\n", n->children->next->token->value, called_parameters_buffer + 2);
+			printf("Cannot find symbol %s(%s)\n", param_node->token->value, called_parameters_buffer + 2);
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
 			return "undef";
