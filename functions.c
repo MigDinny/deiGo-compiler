@@ -98,9 +98,6 @@ int count_children(node_t *first_child) {
 	return n;
 }
 
-
-
-
 /*
 VarDecl
 FuncDecl
@@ -120,7 +117,6 @@ void insert_element(symtab_t *table, elem_t *new) {
 		last_element->next = new;
 	}
 }
-
 
 symtab_t* create_table(symtab_t *global, elem_t *origin) {
 	symtab_t *t = (symtab_t*) malloc(sizeof(symtab_t));
@@ -172,7 +168,6 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	
 	return e;
 }
-
 
 // CALL LIKE THIS: traverseAndPopulateTable(global, program);
 void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
@@ -281,11 +276,16 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 // CALL traverseAndCheckTree(myprogram, NULL, global);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	// nodes to be ignored and stop child processing!
+
+	char * operator = n->token->symbol;
+	n->token->symbol = strdup(getOperator(operator));
+	printf("%s\n", n->token->symbol);
 	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) return NULL; 
 
 	
 
 	// specific nodes which require specific actions 
+	//TODO: adicionar casos "ParseArgs" (erro em "errors_parseargs.out") e "Print" (erro em "statements_expressions.out")
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
 		elem_t *look = symtab_look(tabname, global, n->token->value);
@@ -319,7 +319,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "string";
 		// return string type
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
+	} else if (strcmp(n->token->symbol, "+") == 0 || strcmp(n->token->symbol, "-") == 0 || strcmp(n->token->symbol, "*") == 0 || strcmp(n->token->symbol, "/") == 0 || strcmp(n->token->symbol, "%%") == 0)  { 
 		// both types must be equal and must be INT or FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -431,7 +431,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = look->type;
 		n->children->noted_type = look->type;
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+	} else if (strcmp(n->token->symbol, "<") == 0|| strcmp(n->token->symbol, ">") == 0 || strcmp(n->token->symbol, "==") == 0 || strcmp(n->token->symbol, "!=") == 0 || strcmp(n->token->symbol, "<=") == 0 || strcmp(n->token->symbol, ">=") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -447,7 +447,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		n->noted_type = "undef";
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0 ) {
+	} else if (strcmp(n->token->symbol, "||") == 0 || strcmp(n->token->symbol, "&&") == 0 ) {
 		// OR and AND require both children to be BOOL
 
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
@@ -463,7 +463,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
 		n->noted_type = "undef";
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Not") == 0) {
+	} else if (strcmp(n->token->symbol, "!") == 0) {
 		// the only child must be bool
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		
@@ -478,7 +478,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "undef";
 		return n->noted_type;
 
-	} else if (strcmp(n->token->symbol, "Assign") == 0) {
+	} else if (strcmp(n->token->symbol, "=") == 0) {
 		// assigned type must be the same as the variable's type receiving the value
 		
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
@@ -544,7 +544,6 @@ void printTableElements(elem_t * element){
 	printTableElements(element->next);
 
 }
-
 
 void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 
@@ -668,4 +667,25 @@ char * toLowerFirstChar(char *s) {
 	char *sdup = strdup(s);
 	if (s[0] >= 65 && s[0] <= 90) sdup[0] += 32;
 	return sdup;
+}
+
+char * getOperator(char * symbol){
+	if (strcmp(symbol, "Or") == 0) return "||";
+	else if (strcmp(symbol, "And") == 0) return "&&";
+	else if (strcmp(symbol, "Lt") == 0) return "<";
+	else if (strcmp(symbol, "Gt") == 0) return ">";
+	else if (strcmp(symbol, "Assign") == 0) return "=";
+	else if (strcmp(symbol, "Eq") == 0) return "==";
+	else if (strcmp(symbol, "Ne") == 0) return "!=";
+	else if (strcmp(symbol, "Ge ") == 0) return ">=";
+	else if (strcmp(symbol, "Le") == 0) return "<=";
+	else if (strcmp(symbol, "Not") == 0) return "!";
+	else if (strcmp(symbol, "Add") == 0) return "+";
+	else if (strcmp(symbol, "Sub") == 0) return "-";
+	else if (strcmp(symbol, "Div") == 0) return "/";
+	else if (strcmp(symbol, "Mul") == 0) return "*";
+	else if (strcmp(symbol, "Mod") == 0) return "%%";
+	else if (strcmp(symbol, "ParseArgs") == 0) return "strconv.Atoi";
+	else if (strcmp(symbol, "Print") == 0) return "fmt.Println";
+	else return symbol;
 }
