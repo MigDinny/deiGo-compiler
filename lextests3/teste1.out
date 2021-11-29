@@ -1,0 +1,10 @@
+...
+
+
+Call
+	Id(f) - ()
+Call - undef
+	Id(f) - undef
+	IntLit(1) - int
+
+...

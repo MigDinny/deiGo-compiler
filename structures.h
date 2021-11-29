@@ -17,9 +17,12 @@ typedef struct node {
 	int literal;
 	token_t *token;
 	char *noted_type;
+	char *noted_params;
 	struct node *children;
 	struct node *next;
-
+	int printFuncParamsInNode;
+	int printFuncParams;
+	
 	char *funcTabName;
 } node_t;
 
@@ -32,7 +35,6 @@ typedef struct elem {
 	int tparam;
 	int hits; // # of times this element was accessed for reading
 	int column, line;
-	int printFuncParams;
 
 	struct elem *next;
 	

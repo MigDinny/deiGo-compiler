@@ -154,11 +154,13 @@ int main(int argc, char *argv[ ])
                 global = create_global_table();
 
                 traverseAndPopulateTable(global, myprogram);
-                printTables(global);
-
+                
                 // check arvore + inserir tipos nos nós + consultar tabela
 
                 traverseAndCheckTree(myprogram, NULL, global);
+                throwErrorDeclaredButNeverUsed(global);
+                
+                printTables(global);
                 printNotedTree(myprogram, 0, global);
             }
         }

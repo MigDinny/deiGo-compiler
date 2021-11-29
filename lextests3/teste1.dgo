@@ -1,0 +1,10 @@
+func f() { }
+
+func g() {
+	f();
+	f(1);
+	var a int;
+	a = f();
+}
+
+
