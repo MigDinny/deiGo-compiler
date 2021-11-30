@@ -276,13 +276,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 // CALL traverseAndCheckTree(myprogram, NULL, global);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	// nodes to be ignored and stop child processing!
-
-	char * operator = n->token->symbol;
-	n->token->symbol = strdup(getOperator(operator));
-	printf("%s\n", n->token->symbol);
 	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) return NULL; 
-
-	
 
 	// specific nodes which require specific actions 
 	//TODO: adicionar casos "ParseArgs" (erro em "errors_parseargs.out") e "Print" (erro em "statements_expressions.out")
@@ -319,7 +313,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "string";
 		// return string type
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "+") == 0 || strcmp(n->token->symbol, "-") == 0 || strcmp(n->token->symbol, "*") == 0 || strcmp(n->token->symbol, "/") == 0 || strcmp(n->token->symbol, "%%") == 0)  { 
+	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
 		// both types must be equal and must be INT or FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -331,7 +325,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// the types dont meet the above requirements
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
@@ -431,7 +425,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = look->type;
 		n->children->noted_type = look->type;
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "<") == 0|| strcmp(n->token->symbol, ">") == 0 || strcmp(n->token->symbol, "==") == 0 || strcmp(n->token->symbol, "!=") == 0 || strcmp(n->token->symbol, "<=") == 0 || strcmp(n->token->symbol, ">=") == 0 ) {
+	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -443,11 +437,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are not INT or FLOAT32, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "||") == 0 || strcmp(n->token->symbol, "&&") == 0 ) {
+	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0 ) {
 		// OR and AND require both children to be BOOL
 
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
@@ -460,10 +454,10 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are NOT bool, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 		n->noted_type = "undef";
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "!") == 0) {
+	} else if (strcmp(n->token->symbol, "Not") == 0) {
 		// the only child must be bool
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		
@@ -474,11 +468,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// child is not bool
-		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1);
+		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1);
 		n->noted_type = "undef";
 		return n->noted_type;
 
-	} else if (strcmp(n->token->symbol, "=") == 0) {
+	} else if (strcmp(n->token->symbol, "Assign") == 0) {
 		// assigned type must be the same as the variable's type receiving the value
 		
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
@@ -486,7 +480,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// the types are not equal, throw error
 		if (strcmp(type1, type2) != 0) {
-			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 		}
 
 		// no need to set noted_type
