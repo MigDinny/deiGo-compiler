@@ -18,3 +18,4 @@ Erros
 [x] - TODO: 7 - print out params after CALL Id(factorial) - (int)
 [x] - SEGFAULT no errors.dgo (se este ficheiro passar, puta que pariu, temos de ter 250 no mooshak...)
 [ ] - Rodar sem flag e ver se há análise semantica se houver erros sintaticos e lex
+[ ] - logical_operators.dgo >> basicamente, criar um booleano para saber se a variável já foi declarada. ver do segfault ..
