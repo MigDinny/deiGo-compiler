@@ -1,0 +1,22 @@
+package main;
+
+func f(b float32, i int) { }
+var b int;
+
+func retornaNone() { }
+
+
+func g() int {
+	f();
+	f(2.0, 2, 2.0);
+	f(2.0, 2.0);
+	f(2.0, 2);
+	f(2.0);
+	f(2.0, 2.0, 2.0);
+	b = g()
+	var a int;
+	a = f();
+	a = retornaNone();
+}
+
+
