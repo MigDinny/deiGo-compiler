@@ -19,6 +19,7 @@ typedef struct node {
 	char *noted_type;
 	struct node *children;
 	struct node *next;
+	int line, column;
 
 	char *funcTabName;
 } node_t;

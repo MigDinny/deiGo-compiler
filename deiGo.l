@@ -58,55 +58,56 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 <DOUBLECOMM>{newline}               {if (flagEOF == 1 && flagL) { printf("SEMICOLON\n"); flagEOF = 0; flagEOFaux = 1;} yylineno++; yycolumnno = 1; if (flagEOFaux == 1 && !flagL) { flagEOFaux = 0; return SEMICOLON; }}
 <DOUBLECOMM>.                       {yycolumnno += yyleng;}
 
-{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 0; yylval.letters = strdup(yytext); if (!flagL) return RESERVED;}
 ","                                 {if (flagL) printf("COMMA\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return COMMA;}
 "_"                                 {if (flagL) printf("BLANKID\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return BLANKID;}
-"="                                 {if (flagL) printf("ASSIGN\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return ASSIGN;}
-"*"                                 {if (flagL) printf("STAR\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return STAR;}
-"/"                                 {if (flagL) printf("DIV\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return DIV;}
-"-"                                 {if (flagL) printf("MINUS\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return MINUS;}
-"+"                                 {if (flagL) printf("PLUS\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return PLUS;}
-"=="                                {if (flagL) printf("EQ\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return EQ;}
-">="                                {if (flagL) printf("GE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return GE;}
-">"                                 {if (flagL) printf("GT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return GT;}
 "{"                                 {if (flagL) printf("LBRACE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return LBRACE;}
-"<="                                {if (flagL) printf("LE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return LE;}
 "("                                 {if (flagL) printf("LPAR\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return LPAR;}
 "["                                 {if (flagL) printf("LSQ\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return LSQ;}
-"<"                                 {if (flagL) printf("LT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return LT;}
-"%"                                 {if (flagL) printf("MOD\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return MOD;}
-"!="                                {if (flagL) printf("NE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return NE;}
-"!"                                 {if (flagL) printf("NOT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return NOT;}
-"&&"                                {if (flagL) printf("AND\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return AND;}
-"||"                                {if (flagL) printf("OR\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return OR;}
 "package"                           {if (flagL) printf("PACKAGE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return PACKAGE;}
 "else"                              {if (flagL) printf("ELSE\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return ELSE;}
 "for"                               {if (flagL) printf("FOR\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return FOR;}
-"if"                                {if (flagL) printf("IF\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return IF;}
 "var"                               {if (flagL) printf("VAR\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return VAR;}
 "int"                               {if (flagL) printf("INT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return INT;}
 "float32"                           {if (flagL) printf("FLOAT32\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return FLOAT32;}
 "bool"                              {if (flagL) printf("BOOL\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return BOOL;}
-"string"                            {if (flagL) printf("STRING\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return STRING;}
-"fmt.Println"                       {if (flagL) printf("PRINT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return PRINT;}
-"strconv.Atoi"                      {if (flagL) printf("PARSEINT\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return PARSEINT;}
 "func"                              {if (flagL) printf("FUNC\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return FUNC;}
 "os.Args"                           {if (flagL) printf("CMDARGS\n"); yycolumnno += yyleng; flagEOF = 0; if (!flagL) return CMDARGS;}
 
 "}"                                 {if (flagL) printf("RBRACE\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RBRACE;}
 ")"                                 {if (flagL) printf("RPAR\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RPAR;}
 "]"                                 {if (flagL) printf("RSQ\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RSQ;}
-"return"                            {if (flagL) printf("RETURN\n"); yycolumnno += yyleng; flagEOF = 1; if (!flagL) return RETURN;}
 
-{id}                                {if (flagL) printf("ID(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return ID;}
-{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return INTLIT;}
-{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yycolumnno += yyleng; flagEOF = 1; yylval.letters = strdup(yytext); if (!flagL) return REALLIT;}
+"="                                 {if (flagL) printf("ASSIGN\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Assign", NULL, yylineno, initialColumn); return ASSIGN;}}
+"*"                                 {if (flagL) printf("STAR\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Mul", NULL, yylineno, initialColumn); return STAR;}}
+"/"                                 {if (flagL) printf("DIV\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Div", NULL, yylineno, initialColumn); return DIV;}}
+"-"                                 {if (flagL) printf("MINUS\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Sub", NULL, yylineno, initialColumn); return MINUS;}}
+"+"                                 {if (flagL) printf("PLUS\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Add", NULL, yylineno, initialColumn); return PLUS;}}
+"=="                                {if (flagL) printf("EQ\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Eq", NULL, yylineno, initialColumn); return EQ;}}
+">="                                {if (flagL) printf("GE\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Ge", NULL, yylineno, initialColumn); return GE;}}
+">"                                 {if (flagL) printf("GT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Gt", NULL, yylineno, initialColumn); return GT;}}
+"<="                                {if (flagL) printf("LE\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Le", NULL, yylineno, initialColumn); return LE;}}
+"<"                                 {if (flagL) printf("LT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Lt", NULL, yylineno, initialColumn); return LT;}}
+"%"                                 {if (flagL) printf("MOD\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Mod", NULL, yylineno, initialColumn); return MOD;}}
+"!="                                {if (flagL) printf("NE\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Ne", NULL, yylineno, initialColumn); return NE;}}
+"!"                                 {if (flagL) printf("NOT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Not", NULL, yylineno, initialColumn); return NOT;}}
+"&&"                                {if (flagL) printf("AND\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("And", NULL, yylineno, initialColumn); return AND;}}
+"||"                                {if (flagL) printf("OR\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Or", NULL, yylineno, initialColumn); return OR;}}
+"if"                                {if (flagL) printf("IF\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("If", NULL, yylineno, initialColumn); return IF;}}
+"string"                            {if (flagL) printf("STRING\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("String", NULL, yylineno, initialColumn); return STRING;}}
+"fmt.Println"                       {if (flagL) printf("PRINT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Print", NULL, yylineno, initialColumn); return PRINT;}}
+"strconv.Atoi"                      {if (flagL) printf("PARSEINT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Atoi", NULL, yylineno, initialColumn); return PARSEINT;}}
+"return"                            {if (flagL) printf("RETURN\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 1; if (!flagL) {yylval.value = create_token("Return", NULL, yylineno, initialColumn); return RETURN;}}
+
+{id}                                {if (flagL) printf("ID(%s)\n", yytext); yylval.value = create_token("Id", strdup(yytext), yylineno, yycolumnno); yycolumnno += yyleng; flagEOF = 1;  if (!flagL) return ID;}
+{int_lit}                           {if (flagL) printf("INTLIT(%s)\n", yytext); yylval.value = create_token("IntLit", strdup(yytext), yylineno, yycolumnno); yycolumnno += yyleng; flagEOF = 1;  if (!flagL) return INTLIT;}
+{real_lit}                          {if (flagL) printf("REALLIT(%s)\n", yytext); yylval.value = create_token("RealLit", strdup(yytext), yylineno, yycolumnno); yycolumnno += yyleng; flagEOF = 1;  if (!flagL) return REALLIT;}
+{reserved}                          {if (flagL) printf("RESERVED(%s)\n", yytext); yylval.value = create_token("Reserved", strdup(yytext), yylineno, yycolumnno); yycolumnno += yyleng; flagEOF = 0;  if (!flagL) return RESERVED;}
 
 0([0-7]*[89]+[0-7]*)+               {printf("Line %d, column %d: invalid octal constant (%s)\n", yylineno, yycolumnno, yytext); yycolumnno += yyleng; flagEOF = 0;}
 
 \"                                  {BEGIN STRLIT; flagError = 0; flagEOF = 0;  initialLine = yylineno; initialColumn = yycolumnno; yycolumnno += yyleng;}
 
-<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); yycolumnno += yyleng; if (flagError == 0) flagEOF = 1; yylval.letters = strdup(strlit_buffer); strlit_buffer[0] = 0; strlit_buffer_pos = 0; if (!flagL && !flagError) { flagError = 0; return STRLIT2; } else flagError = 0;}
+<STRLIT>\"                          {BEGIN 0; if (flagL && !flagError) printf("STRLIT(\"%s\")\n", strlit_buffer); yylval.value = create_token("Strlit", strdup(yytext), initialLine, initialColumn); yycolumnno += yyleng; if (flagError == 0) flagEOF = 1;  strlit_buffer[0] = 0; strlit_buffer_pos = 0; if (!flagL && !flagError) { flagError = 0; return STRLIT2; } else flagError = 0;}
 <STRLIT>[^\\\n\r]|{escape_sequence}     {
                                     if (strlit_buffer_pos == strlit_buffer_alloc_size - 1) {
                                         strlit_buffer_alloc_size += 100;
@@ -186,7 +187,7 @@ void yyerror (const char *s) {
     error2 += 1;
     if (strcmp(yytext, "\"") == 0) {
         // syntax error: "
-        printf ("Line %d, column %d: %s: \"%s\"\n", yylineno, yycolumnno - (int) strlen(yylval.letters) - 2, s, yylval.letters);
+        printf ("Line %d, column %d: %s: \"%s\"\n", yylineno, yycolumnno - (int) strlen(yylval.value->value) - 2, s, yylval.value->value);
     } else { 
         if (flagUseAux) {
             printf ("Line %d, column %d: %s: %s\n", yylineno_aux, yycolumnno_aux, s, yytext);
