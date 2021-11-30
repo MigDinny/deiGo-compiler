@@ -428,7 +428,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
 			//look->params = "(undef)";
-			n->children->noted_params = "(undef)";
+			n->children->noted_params = "undef";
 			//printf("<%s,%s>", n->children->token->value, n->children->noted_params);
 			return "undef";
 		}

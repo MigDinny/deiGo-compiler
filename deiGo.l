@@ -159,7 +159,7 @@ int main(int argc, char *argv[ ])
 
                 traverseAndCheckTree(myprogram, NULL, global);
                 throwErrorDeclaredButNeverUsed(global);
-                
+                printf("\n");
                 printTables(global);
                 printNotedTree(myprogram, 0, global);
             }
@@ -170,6 +170,18 @@ int main(int argc, char *argv[ ])
 este seja válido, proceder à análise semântica. No caso em que não é passada qualquer opção, o
 analisador deve apenas escrever no stdout as mensagens de erro.
          */
+
+         yyparse();
+
+         if (error2 == 0) {
+             global = create_global_table();
+
+             traverseAndPopulateTable(global, myprogram);
+
+             traverseAndCheckTree(myprogram, NULL, global);
+
+             throwErrorDeclaredButNeverUsed(global);
+         }
 
     }
 
