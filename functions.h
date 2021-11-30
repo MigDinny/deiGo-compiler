@@ -24,3 +24,4 @@ elem_t* symtab_look(char *tabname, symtab_t *global, char *id);
 int symtab_find_duplicate(symtab_t *tab, char *id);
 void throwErrorDeclaredButNeverUsed(symtab_t *global);
 char * toLowerFirstChar(char *s);
+char * getOperator(char * symbol);

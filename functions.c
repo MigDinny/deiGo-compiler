@@ -98,9 +98,6 @@ int count_children(node_t *first_child) {
 	return n;
 }
 
-
-
-
 /*
 VarDecl
 FuncDecl
@@ -121,7 +118,6 @@ void insert_element(symtab_t *table, elem_t *new) {
 		last_element->next = new;
 	}
 }
-
 
 symtab_t* create_table(symtab_t *global, elem_t *origin) {
 	symtab_t *t = (symtab_t*) malloc(sizeof(symtab_t));
@@ -172,7 +168,6 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	
 	return e;
 }
-
 
 // CALL LIKE THIS: traverseAndPopulateTable(global, program);
 void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
@@ -283,9 +278,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	// nodes to be ignored and stop child processing!
 	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) return NULL; 
 
-	
-
 	// specific nodes which require specific actions 
+	//TODO: adicionar casos "ParseArgs" (erro em "errors_parseargs.out") e "Print" (erro em "statements_expressions.out")
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
 		elem_t *look = symtab_look(tabname, global, n->token->value);
@@ -332,7 +326,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// the types dont meet the above requirements
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
@@ -449,7 +443,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are not INT or FLOAT32, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "bool";
 		return n->noted_type;
@@ -466,8 +460,9 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are NOT bool, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 		n->noted_type = "bool";
+
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Not") == 0) {
 		// the only child must be bool
@@ -480,8 +475,9 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// child is not bool
-		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1);
+		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1);
 		n->noted_type = "bool";
+    
 		return n->noted_type;
 
 	} else if (strcmp(n->token->symbol, "Assign") == 0) {
@@ -492,7 +488,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// the types are not equal, throw error
 		if (strcmp(type1, type2) != 0) {
-			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, n->token->symbol, type1, type2);
+			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
 		}
 
 		// no need to set noted_type
@@ -551,7 +547,6 @@ void printTableElements(elem_t * element){
 	printTableElements(element->next);
 
 }
-
 
 void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 
@@ -680,4 +675,25 @@ char * toLowerFirstChar(char *s) {
 	char *sdup = strdup(s);
 	if (s[0] >= 65 && s[0] <= 90) sdup[0] += 32;
 	return sdup;
+}
+
+char * getOperator(char * symbol){
+	if (strcmp(symbol, "Or") == 0) return "||";
+	else if (strcmp(symbol, "And") == 0) return "&&";
+	else if (strcmp(symbol, "Lt") == 0) return "<";
+	else if (strcmp(symbol, "Gt") == 0) return ">";
+	else if (strcmp(symbol, "Assign") == 0) return "=";
+	else if (strcmp(symbol, "Eq") == 0) return "==";
+	else if (strcmp(symbol, "Ne") == 0) return "!=";
+	else if (strcmp(symbol, "Ge ") == 0) return ">=";
+	else if (strcmp(symbol, "Le") == 0) return "<=";
+	else if (strcmp(symbol, "Not") == 0) return "!";
+	else if (strcmp(symbol, "Add") == 0) return "+";
+	else if (strcmp(symbol, "Sub") == 0) return "-";
+	else if (strcmp(symbol, "Div") == 0) return "/";
+	else if (strcmp(symbol, "Mul") == 0) return "*";
+	else if (strcmp(symbol, "Mod") == 0) return "%%";
+	else if (strcmp(symbol, "ParseArgs") == 0) return "strconv.Atoi";
+	else if (strcmp(symbol, "Print") == 0) return "fmt.Println";
+	else return symbol;
 }
