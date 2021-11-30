@@ -20,8 +20,9 @@ typedef struct node {
 	char *noted_params;
 	struct node *children;
 	struct node *next;
+	int line, column;
 
-	int printFuncParamsInNode;
+	int printFuncParams;
 	
 	char *funcTabName;
 } node_t;

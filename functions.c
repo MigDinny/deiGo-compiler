@@ -672,6 +672,7 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
 				//printf("<%s>", global_aux_element->id);
+				printf("Element id: %s -- params %s -- type %s -- line %d -- column %d\n", global_aux_element->id, global_aux_element->params, global_aux_element->type, global_aux_element->line, global_aux_element->column);
 				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", global_aux_element->line, global_aux_element->column, global_aux_element->id);
 				global_aux_element = global_aux_element->next;
 		}
