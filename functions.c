@@ -123,6 +123,7 @@ void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
 	if (symtab_find_duplicate(table, new->id) == 1) {
 		// throw error ALREADY EXISTS
 		printf("Line %d, column %d: Symbol %s already defined\n", origin->line, origin->column, new->id);
+		return;
 	}
 
 	if (table->first_element == NULL)
