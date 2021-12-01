@@ -295,7 +295,6 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 // CALL traverseAndCheckTree(myprogram, NULL, global);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
-	//printf("<%s>\n", n->token->symbol);
 	// nodes to be ignored and stop child processing!
 	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) {
 		if (strcmp(n->token->symbol, "VarDecl") == 0) {
@@ -365,6 +364,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "undef";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
+		
 		node_t *first_child = n->children;
 		// call recursively on params first
 		for (first_child = first_child->next; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
@@ -376,7 +376,6 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			// ERROR NOT DEFINED
 			first_child = n->children;
 			first_child->noted_type = "undef";
-
 			//TODO: o erro "cannot find symbol" está printar "g(int, none)" em vez de "g(int,none") ; tirar esse espaço
 			printf("Line %d, column %d: Cannot find symbol %s(", first_child->line, first_child->column, first_child->token->value);
 			first_child = n->children->next;
@@ -385,14 +384,12 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 				if (first_child->next == NULL) printf("%s", first_child->noted_type);
 				else printf("%s,", first_child->noted_type);
 			}
-
 			printf(")\n");
 
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
 			return "undef";
 		}
-
 		n->children->printFuncParams = 1;
 		
 		// check each parameter against declared parameters
@@ -534,21 +531,20 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 	} else if (strcmp(n->token->symbol, "Assign") == 0) {
 		// assigned type must be the same as the variable's type receiving the value
-		
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
-
 		// the types are not equal, throw error
 		if (strcmp(type1, type2) != 0) {
 			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 		}
-
 		// no need to set noted_type
-		n->noted_type = n->children->noted_type;
+		n->noted_type = type1;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "For") == 0 || strcmp(n->token->symbol, "If") == 0) {
 		// process children first
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
+		if (n->children->noted_type == NULL) return NULL;
 
 		// expression inside FOR and IF must be BOOL
 		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, toLowerFirstChar(n->token->symbol));
@@ -575,13 +571,14 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	} else if (strcmp(n->token->symbol, "Print") == 0) {
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 
-		if (strcmp(type1, "string") != 0) {
+		if (strcmp(type1, "undef") == 0) {
 			// incompatible type
 			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, getOperator(n->token->symbol));
 		}
 
 		return NULL;
 	} else {
+		
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
 		// if this node is FuncDecl, change tab reference to this function's table

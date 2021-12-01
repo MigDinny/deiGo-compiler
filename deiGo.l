@@ -157,8 +157,9 @@ int main(int argc, char *argv[ ])
                 traverseAndPopulateTable(global, myprogram);
                 
                 // check arvore + inserir tipos nos nós + consultar tabela
-
+                
                 traverseAndCheckTree(myprogram, NULL, global);
+                
                 throwErrorDeclaredButNeverUsed(global);
                 printf("\n");
                 printTables(global);
