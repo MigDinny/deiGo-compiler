@@ -13,7 +13,7 @@ Erros
 [x] - add support to ParseArgs, Minus, Plus, etc nodes... (logical_operators) and noted type on Assign, ParseArgs, operations, Minus Plus ....
 
 Testing errors:
-[ ] - Adicionar os casos do ParseArgs e Print no "traverseAndCheckTree";
+[x] - Adicionar os casos do ParseArgs e Print no "traverseAndCheckTree";
 [x] - Na árvore, falta meter o tipo à frente do Assign. Exemplo: "Assign - int"
 [ ] - Na árvore, retirar o tipo "none" aos Call. Fica "Call" em vez de "Call - none"
 [ ] - No print de erro "Cannot find symbols x(..., ...,)", não pode haver espaço dentro dos parêntesis, tem que ficar x(...,...). Alguns têm espaço, outros não.
