@@ -7,7 +7,7 @@
 extern int yycolumnno_aux;
 extern int yylineno_aux;
 
-node_t* create_node(char* symbol) {
+node_t* create_node(char* symbol, int line, int column) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
 	token_t *t = (token_t*) malloc(sizeof(token_t));
@@ -18,6 +18,8 @@ node_t* create_node(char* symbol) {
 	n->next 	= NULL;
 	n->token = t;
 	n->literal = 0;
+	n->line = line;
+	n->column = column;
 	
 	return n;
 }
@@ -37,7 +39,7 @@ node_t* create_block_node() {
 	return n;
 }
 
-node_t* create_literal_node(char *symbol, char *value) {
+node_t* create_literal_node(char *symbol, char *value, int line, int column) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
 	token_t *t = (token_t*) malloc(sizeof(token_t));
@@ -50,8 +52,19 @@ node_t* create_literal_node(char *symbol, char *value) {
 	n->next 	= NULL;
 	n->token = t;
 	n->literal = 1;
+	n->line = line;
+	n->column = column;
 
 	return n;
+}
+
+token_t* create_token(char* symbol, char * value, int line, int column){
+	token_t *t = (token_t *)malloc(sizeof(token_t));
+	t->symbol = symbol;
+	t->value = value;
+    t->line = line;
+    t->column = column;
+    return t;
 }
 
 void add_child(node_t *father, node_t *child) {
@@ -102,10 +115,14 @@ int count_children(node_t *first_child) {
 VarDecl
 FuncDecl
 */
-void insert_element(symtab_t *table, elem_t *new) {
+void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
+	
+	new->line = origin->line;
+	new->column = origin->column; 
+
 	if (symtab_find_duplicate(table, new->id) == 1) {
 		// throw error ALREADY EXISTS
-		printf("Line %d, column %d: Symbol %s already defined\n", yylineno_aux, yycolumnno_aux, new->id);
+		printf("Line %d, column %d: Symbol %s already defined\n", origin->line, origin->column, new->id);
 		return;
 	}
 
@@ -187,7 +204,8 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 			elem_t *new = create_element(id, NULL, type, 0);
 
-			insert_element(tab, new);
+			// printf("\n\nINSERT ELEMENT\nNODE -> Line: %d, Column: %d\nELEMENT -> Line %d, Column: %d\n\n", current_node->children->next->line, current_node->children->next->column, new->line, new->column);
+			insert_element(tab, new, current_node->children->next);
 		} else if (strcmp(current_node->token->symbol, "FuncDecl") == 0) {
 			// FUNCDECL: 1st child > header
 			//           header: 1st child > id   2nd child > returned type    3rd child > funcparams
@@ -245,7 +263,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			elem_t *new = create_element(id, params_buffer, type, 1);
 
 			// insert it
-			insert_element(tab, new);
+			insert_element(tab, new, current_node->children->children);
 
 
 			// create new table for this function
@@ -267,7 +285,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			elem_t *new = create_element(id, NULL, type, 0);
 			new->tparam = 1;
 
-			insert_element(tab, new);
+			insert_element(tab, new, current_node->children->next);
 		}
 	}
 
@@ -287,7 +305,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		
 		if (look == NULL) {
 			// ERROR NOT DEFINED
-			printf("Line %d, column %d: Cannot find symbol %s\n", yylineno_aux, yycolumnno_aux, n->token->value);
+			printf("Line %d, column %d: Cannot find symbol %s\n", n->line, n->column, n->token->value);
 			n->noted_type = "undef";
 			return "undef";
 		}
@@ -326,7 +344,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// the types dont meet the above requirements
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "undef";
 		return n->noted_type;
@@ -342,7 +360,9 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			// ERROR NOT DEFINED
 			first_child = n->children;
 			first_child->noted_type = "undef";
-			printf("Line %d, column %d: Cannot find symbol %s(", yylineno_aux, yycolumnno_aux, first_child->token->value);
+
+			//TODO: o erro "cannot find symbol" está printar "g(int, none)" em vez de "g(int,none") ; tirar esse espaço
+			printf("Line %d, column %d: Cannot find symbol %s(", first_child->line, first_child->column, first_child->token->value);
 			first_child = n->children->next;
 
 			for (; first_child != NULL; first_child = first_child->next) {
@@ -418,7 +438,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		if (errors > 0) {
 			//printf("<<%s>>\n", param_node->token->symbol);
-			printf("Cannot find symbol %s(%s)\n", n->children->token->value, called_parameters_buffer + 2);
+			printf("Line %d, column %d: Cannot find symbol %s(%s)\n", n->children->line, n->children->column, n->children->token->value, called_parameters_buffer + 2);
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
 			//look->params = "(undef)";
@@ -443,7 +463,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are not INT or FLOAT32, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 
 		n->noted_type = "bool";
 		return n->noted_type;
@@ -460,9 +480,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are NOT bool, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 		n->noted_type = "bool";
-
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Not") == 0) {
 		// the only child must be bool
@@ -475,9 +494,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// child is not bool
-		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1);
+		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", n->line, n->column, getOperator(n->token->symbol), type1);
 		n->noted_type = "bool";
-    
 		return n->noted_type;
 
 	} else if (strcmp(n->token->symbol, "Assign") == 0) {
@@ -488,7 +506,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// the types are not equal, throw error
 		if (strcmp(type1, type2) != 0) {
-			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 		}
 
 		// no need to set noted_type
@@ -498,7 +516,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
 		// expression inside FOR and IF must be BOOL
-		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", yylineno_aux, yycolumnno_aux, n->children->noted_type, toLowerFirstChar(n->token->symbol));
+		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, toLowerFirstChar(n->token->symbol));
 
 		// return NULL anyways, because FOR doesn't have any noted_type
 		return NULL;
@@ -514,14 +532,13 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	return NULL;
 }
 
-
 void printTables(symtab_t *global){
 
 	if (global == NULL) return;
 
-    if (global->name == NULL && global->params == NULL) printf("==== Global Symbol Table ====\n");
-    else if (global->params == NULL) printf("==== Function %s() Symbol Table =====\n", global->name);
-    else printf("==== Function %s%s Symbol Table =====\n", global->name, global->params);
+    if (global->name == NULL && global->params == NULL) printf("===== Global Symbol Table =====\n");
+    else if (global->params == NULL) printf("===== Function %s() Symbol Table =====\n", global->name);
+    else printf("===== Function %s%s Symbol Table =====\n", global->name, global->params);
 
 	printTableElements(global->first_element);
 
@@ -659,10 +676,13 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 	symtab_t * global_aux = global;
 	elem_t * global_aux_element = global->first_element;
 	
+	// printf("\n\n--- MAIN -> THROW_ERROR_DECLARED_BUT_NEVER_USED ---\n\n");
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
 				//printf("<%s>", global_aux_element->id);
-				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", yylineno_aux, yycolumnno_aux, global_aux_element->id);
+				
+				// printf("Element id: %s -- params %s -- type %s -- line %d -- column %d\n", global_aux_element->id, global_aux_element->params, global_aux_element->type, global_aux_element->line, global_aux_element->column);
+				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", global_aux_element->line, global_aux_element->column, global_aux_element->id);
 				global_aux_element = global_aux_element->next;
 		}
 		global_aux = global_aux->next;
