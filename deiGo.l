@@ -27,7 +27,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     #include "functions.h"
     
     int initialLine, initialColumn = 1;
-    int flagL, flagT, flagError, flagEOF, flagEOFaux, flagEOF_strlit, flagUseAux, strlit_buffer_pos = 0;
+    int flagL, flagT, flagS, flagError, flagEOF, flagEOFaux, flagEOF_strlit, flagUseAux, strlit_buffer_pos = 0;
     char left_bracket = '(';
     int yycolumnno = 1;
     int yycolumnno_aux = 1;
@@ -149,7 +149,7 @@ int main(int argc, char *argv[ ])
         } else if (strcmp(argv[1], "-s") == 0) {
             // análise lexical, análise sintática e semantica. print tabelas + arvore anotada
             yyparse();
-            
+            flagS = 1;
             if (error2 == 0) {
                 // ler árvore + popular tabela
                 global = create_global_table();
@@ -159,7 +159,6 @@ int main(int argc, char *argv[ ])
                 // check arvore + inserir tipos nos nós + consultar tabela
 
                 traverseAndCheckTree(myprogram, NULL, global);
-                throwErrorDeclaredButNeverUsed(global);
                 printf("\n");
                 printTables(global);
                 printNotedTree(myprogram, 0, global);
