@@ -295,7 +295,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 // CALL traverseAndCheckTree(myprogram, NULL, global);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
-	printf("<%s>\n", n->token->symbol);
+	//printf("<%s>\n", n->token->symbol);
 	// nodes to be ignored and stop child processing!
 	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) {
 		if (strcmp(n->token->symbol, "VarDecl") == 0) {
@@ -544,7 +544,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// no need to set noted_type
-		return NULL;
+		n->noted_type = n->children->noted_type;
+		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "For") == 0 || strcmp(n->token->symbol, "If") == 0) {
 		// process children first
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
@@ -554,6 +555,17 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// return NULL anyways, because FOR doesn't have any noted_type
 		return NULL;
+	} else if (strcmp(n->token->symbol, "Minus") == 0 || strcmp(n->token->symbol, "Plus") == 0) {
+		// process child
+		traverseAndCheckTree(n->children, tabname, global);
+
+		n->noted_type = n->children->noted_type;
+		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "ParseArgs") == 0) {
+		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
+
+		n->noted_type = n->children->noted_type;
+		return n->noted_type;
 	} else {
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
