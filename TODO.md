@@ -14,10 +14,10 @@ Erros
 
 Testing errors:
 [ ] - Adicionar os casos do ParseArgs e Print no "traverseAndCheckTree";
-[ ] - Na árvore, falta meter o tipo à frente do Assign. Exemplo: "Assign - int"
+[x] - Na árvore, falta meter o tipo à frente do Assign. Exemplo: "Assign - int"
 [ ] - Na árvore, retirar o tipo "none" aos Call. Fica "Call" em vez de "Call - none"
 [ ] - No print de erro "Cannot find symbols x(..., ...,)", não pode haver espaço dentro dos parêntesis, tem que ficar x(...,...). Alguns têm espaço, outros não.
 [ ] - Erros a mais em "variable_func_assign_errors" (corrige o ponto seguinte em princípio)
-[ ] - Erros a mais em "errors.out"
-[ ] - segfault em "logical_operators"
+[x] - Erros a mais em "errors.out"
+[x] - segfault em "logical_operators"
 [ ] - segfault em "statements_expressions"

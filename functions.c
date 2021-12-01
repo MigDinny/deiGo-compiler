@@ -562,10 +562,25 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = n->children->noted_type;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "ParseArgs") == 0) {
-		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
-
-		n->noted_type = n->children->noted_type;
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+		
+		// the types are not equal, throw error
+		if (strcmp(type1, "int") != 0 || strcmp(type2, "int") != 0) {
+			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
+		}
+		
+		n->noted_type = "int";
 		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "Print") == 0) {
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+
+		if (strcmp(type1, "string") != 0) {
+			// incompatible type
+			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, getOperator(n->token->symbol));
+		}
+
+		return NULL;
 	} else {
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
