@@ -36,7 +36,9 @@ typedef struct elem {
 	int tparam;
 	int hits; // # of times this element was accessed for reading
 	int column, line;
-
+	int isDeclared; // boolean -> when element is created, this is 0. but when we find VarDecl when checking tree, this turns to 1. Elements found with this boolean set to 0 must not be considered. 
+	int isFunction;
+	
 	struct elem *next;
 	
 } elem_t;

@@ -177,6 +177,8 @@ elem_t* create_element(char *id, char *params, char *type, int isFunction) {
 	e->line = 0;
 	e->column = 0;
 	e->params = params;
+	e->isDeclared = 0;
+	e->isFunction = isFunction;
 	
 	if (type == NULL) e->type = "none";
 	else e->type = (char*) toLowerFirstChar(type);
@@ -293,14 +295,28 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 // CALL traverseAndCheckTree(myprogram, NULL, global);
 char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
+	printf("<%s>\n", n->token->symbol);
 	// nodes to be ignored and stop child processing!
-	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) return NULL; 
+	if (strcmp(n->token->symbol, "VarDecl") == 0 || strcmp(n->token->symbol, "ParamDecl") == 0 || strcmp(n->token->symbol, "FuncHeader") == 0) {
+		if (strcmp(n->token->symbol, "VarDecl") == 0) {
+					//printf("<%s>ready; \n", n->children->next->token->value);
+
+			elem_t *look = symtab_look(tabname, global, n->children->next->token->value, 1);
+			//printf("[%s]", look);
+			// if it's a variable, set declared to true
+			if (look == NULL) return NULL;
+			look->isDeclared = 1;
+			//printf("<%s>declared; \n", n->children->next->token->value);
+		}
+
+		return NULL;
+	} 
 
 	// specific nodes which require specific actions 
 	//TODO: adicionar casos "ParseArgs" (erro em "errors_parseargs.out") e "Print" (erro em "statements_expressions.out")
 	if (strcmp(n->token->symbol, "Id") == 0) {
 		// symtab_look() here, EXISTS >> fine DOESNT >> throw error
-		elem_t *look = symtab_look(tabname, global, n->token->value);
+		elem_t *look = symtab_look(tabname, global, n->token->value, 0);
 		n->funcTabName = tabname;
 		
 		if (look == NULL) {
@@ -355,7 +371,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		first_child = n->children;
 
-		elem_t *look = symtab_look(tabname, global, first_child->token->value);
+		elem_t *look = symtab_look(tabname, global, first_child->token->value, 0);
 		if (look == NULL) {
 			// ERROR NOT DEFINED
 			first_child = n->children;
@@ -451,7 +467,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = look->type;
 		n->children->noted_type = look->type;
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -467,6 +483,24 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		n->noted_type = "bool";
 		return n->noted_type;
+	} else if ( strcmp(n->token->symbol, "Eq") == 0 || strcmp(n->token->symbol, "Ne") == 0 ) {
+		
+		// these require to be BOTH INT or BOTH FLOAT32 or BOTH BOOL
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+	
+		if (  (strcmp(type1, "int") == 0 && strcmp(type2, "int") == 0)  || (strcmp(type1, "float32") == 0 && strcmp(type2, "float32") == 0) || (strcmp(type1, "bool") == 0 && strcmp(type2, "bool") == 0) ) {
+			// both types are int
+			n->noted_type = "bool";
+			return n->noted_type;
+		}
+
+		// both types are not INT or FLOAT32, throw error
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+
+		n->noted_type = "bool";
+		return n->noted_type;
+
 	} else if (strcmp(n->token->symbol, "Or") == 0 || strcmp(n->token->symbol, "And") == 0 ) {
 		// OR and AND require both children to be BOOL
 
@@ -580,7 +614,7 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else { // é literal
 			if (strcmp(root->token->symbol, "Id") == 0){
-				elem_t * look = symtab_look(root->funcTabName, global, root->token->value);
+				elem_t * look = symtab_look(root->funcTabName, global, root->token->value, 0);
 				
 				if (look == NULL) printf("%s(%s) - undef\n", root->token->symbol, root->token->value);
 				else {
@@ -610,32 +644,38 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
 		- element found
 		- NULL if no element found
 */
-elem_t* symtab_look(char *tabname, symtab_t *global, char *id) {
+elem_t* symtab_look(char *tabname, symtab_t *global, char *id, int ignoreIsDeclared) {
 	symtab_t *func = global->next;
 	elem_t *found;
 	
+	//printf("FIND: <%s><%s>", id, tabname);
+
 	if (tabname != NULL) {
 		while (func != NULL) {
 			if (strcmp(func->name, tabname) == 0) break;
 			func = func->next;
 		}
-
 		if (func == NULL) return NULL; // appears to be element not found but in reality is func not found. should raise some kind of exception, because this shouldnt never happen. 
 
 		found = func->first_element;
 
 		while (found != NULL) {
-			if (strcmp(found->id, id) == 0) break;
+			if (strcmp(found->id, id) == 0) {
+				if (found->isFunction == 1) break; // if its a function, element is found.
+				else if (found->isDeclared == 1 || ignoreIsDeclared == 1) break;  // if it's variable, needs to be declared first. so, only find it if it is already declared
+			}
 			found = found->next;
 		}
-
 		if (found != NULL) return found; // element found
 	}
 
 	found = global->first_element;
 
 	while (found != NULL) {
-		if (strcmp(found->id, id) == 0) break;
+		if (strcmp(found->id, id) == 0) {
+			if (found->isFunction == 1) break; // if its a function, element is found.
+			else if (found->isDeclared == 1 || ignoreIsDeclared == 1) break; // if it's variable, needs to be declared first. so, only find it if it is already declared
+		}
 		found = found->next;
 	}
 
