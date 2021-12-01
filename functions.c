@@ -480,7 +480,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// both types are NOT bool, throw error
 		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
-		n->noted_type = "undef";
+		n->noted_type = "bool";
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Not") == 0) {
 		// the only child must be bool
@@ -494,7 +494,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		// child is not bool
 		printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", n->line, n->column, getOperator(n->token->symbol), type1);
-		n->noted_type = "undef";
+		n->noted_type = "bool";
 		return n->noted_type;
 
 	} else if (strcmp(n->token->symbol, "Assign") == 0) {

@@ -22,6 +22,7 @@ typedef struct node {
 	struct node *next;
 	int line, column;
 
+	int printFuncParamsInNode;
 	int printFuncParams;
 	
 	char *funcTabName;
