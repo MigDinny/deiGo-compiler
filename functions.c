@@ -117,6 +117,9 @@ FuncDecl
 */
 void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
 	
+	new->line = origin->line;
+	new->column = origin->column; 
+
 	if (symtab_find_duplicate(table, new->id) == 1) {
 		// throw error ALREADY EXISTS
 		printf("Line %d, column %d: Symbol %s already defined\n", origin->line, origin->column, new->id);
@@ -200,6 +203,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 
 			elem_t *new = create_element(id, NULL, type, 0);
 
+			// printf("\n\nINSERT ELEMENT\nNODE -> Line: %d, Column: %d\nELEMENT -> Line %d, Column: %d\n\n", current_node->children->next->line, current_node->children->next->column, new->line, new->column);
 			insert_element(tab, new, current_node->children->next);
 		} else if (strcmp(current_node->token->symbol, "FuncDecl") == 0) {
 			// FUNCDECL: 1st child > header
@@ -355,6 +359,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			// ERROR NOT DEFINED
 			first_child = n->children;
 			first_child->noted_type = "undef";
+
+			//TODO: o erro "cannot find symbol" está printar "g(int, none)" em vez de "g(int,none") ; tirar esse espaço
 			printf("Line %d, column %d: Cannot find symbol %s(", first_child->line, first_child->column, first_child->token->value);
 			first_child = n->children->next;
 
@@ -431,7 +437,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		if (errors > 0) {
 			//printf("<<%s>>\n", param_node->token->symbol);
-			printf("Cannot find symbol %s(%s)\n", n->children->token->value, called_parameters_buffer + 2);
+			printf("Line %d, column %d: Cannot find symbol %s(%s)\n", n->children->line, n->children->column, n->children->token->value, called_parameters_buffer + 2);
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
 			//look->params = "(undef)";
@@ -509,7 +515,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
 		// expression inside FOR and IF must be BOOL
-		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->line, n->column, n->children->noted_type, toLowerFirstChar(n->token->symbol));
+		if (strcmp(n->children->noted_type, "bool") != 0) printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, toLowerFirstChar(n->token->symbol));
 
 		// return NULL anyways, because FOR doesn't have any noted_type
 		return NULL;
@@ -529,9 +535,9 @@ void printTables(symtab_t *global){
 
 	if (global == NULL) return;
 
-    if (global->name == NULL && global->params == NULL) printf("==== Global Symbol Table ====\n");
-    else if (global->params == NULL) printf("==== Function %s() Symbol Table =====\n", global->name);
-    else printf("==== Function %s%s Symbol Table =====\n", global->name, global->params);
+    if (global->name == NULL && global->params == NULL) printf("===== Global Symbol Table =====\n");
+    else if (global->params == NULL) printf("===== Function %s() Symbol Table =====\n", global->name);
+    else printf("===== Function %s%s Symbol Table =====\n", global->name, global->params);
 
 	printTableElements(global->first_element);
 
@@ -669,10 +675,12 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global) {
 	symtab_t * global_aux = global;
 	elem_t * global_aux_element = global->first_element;
 	
+	// printf("\n\n--- MAIN -> THROW_ERROR_DECLARED_BUT_NEVER_USED ---\n\n");
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
 				//printf("<%s>", global_aux_element->id);
-				printf("Element id: %s -- params %s -- type %s -- line %d -- column %d\n", global_aux_element->id, global_aux_element->params, global_aux_element->type, global_aux_element->line, global_aux_element->column);
+				
+				// printf("Element id: %s -- params %s -- type %s -- line %d -- column %d\n", global_aux_element->id, global_aux_element->params, global_aux_element->type, global_aux_element->line, global_aux_element->column);
 				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", global_aux_element->line, global_aux_element->column, global_aux_element->id);
 				global_aux_element = global_aux_element->next;
 		}
