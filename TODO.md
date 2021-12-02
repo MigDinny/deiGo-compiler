@@ -21,3 +21,19 @@ Testing errors:
 [x] - Erros a mais em "errors.out"
 [x] - segfault em "logical_operators"
 [ ] - segfault em "statements_expressions"
+
+[ ] - Tirar (!flagS) no final
+
+**FICHEIROS FUNCIONAIS**
+-- erros --
+
+[x] errors_nonefunccalls
+[ ] errors_parseargs
+[x] errors
+[ ] factorial
+[x] logical_operators
+[x] statements_expressions
+[ ] valid_program
+[ ] variable_func_assign_errors
+
+-- tabelas e árvore
