@@ -466,11 +466,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 		
 		// type is the returned type of the first child (function)
-
-		// TODO: this is working, if it's NONE then "Call - none" will be printed only "Call" but this might change in the future.
-		if (strcmp(look->type, "none") != 0) n->noted_type = look->type;
-		else n->noted_type = NULL; 
-		
+		n->noted_type = look->type;
 		n->children->noted_type = look->type;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
@@ -655,7 +651,8 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\")\n", root->token->value);
         else printf("%s(%s)\n", root->token->symbol, root->token->value);
     } else {
-        if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->noted_type);
+		if (strcmp(root->token->symbol, "Call") == 0 && strcmp(root->noted_type, "none") == 0) printf("Call\n");
+        else if (root->literal == 0) printf("%s - %s\n", root->token->symbol, root->noted_type);
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else { // é literal
 			if (strcmp(root->token->symbol, "Id") == 0){
