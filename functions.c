@@ -584,6 +584,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		return NULL;
 	} else if (strcmp(n->token->symbol, "Return") == 0) {
+		if (n->children == NULL) return NULL;
+		
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 
 		// check if return type is the same as required by the function
