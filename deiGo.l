@@ -95,7 +95,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
 "||"                                {if (flagL) printf("OR\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Or", NULL, yylineno, initialColumn); return OR;}}
 "if"                                {if (flagL) printf("IF\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("If", NULL, yylineno, initialColumn); return IF;}}
 "string"                            {if (flagL) printf("STRING\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("String", NULL, yylineno, initialColumn); return STRING;}}
-"fmt.Println"                       {if (flagL) printf("PRINT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Print", NULL, yylineno, initialColumn); return PRINT;}}
+"fmt.Println"                       {if (flagL) printf("PRINT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Print", NULL, yylineno, yycolumnno + 1); return PRINT;}}
 "strconv.Atoi"                      {if (flagL) printf("PARSEINT\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 0; if (!flagL) {yylval.value = create_token("Atoi", NULL, yylineno, initialColumn); return PARSEINT;}}
 "return"                            {if (flagL) printf("RETURN\n"); initialColumn = yycolumnno; yycolumnno += yyleng; flagEOF = 1; if (!flagL) {yylval.value = create_token("Return", NULL, yylineno, initialColumn); return RETURN;}}
 
@@ -150,7 +150,6 @@ int main(int argc, char *argv[ ])
         } else if (strcmp(argv[1], "-s") == 0) {
             // análise lexical, análise sintática e semantica. print tabelas + arvore anotada
             yyparse();
-            
             if (error2 == 0) {
                 // ler árvore + popular tabela
                 global = create_global_table();
@@ -160,7 +159,6 @@ int main(int argc, char *argv[ ])
                 // check arvore + inserir tipos nos nós + consultar tabela
                 
                 traverseAndCheckTree(myprogram, NULL, global);
-                
                 throwErrorDeclaredButNeverUsed(global);
                 if (errorsSemanticNo > 0) printf("\n");
                 printTables(global);

@@ -7,6 +7,7 @@
 extern int yycolumnno_aux;
 extern int yylineno_aux;
 extern int errorsSemanticNo;
+extern int flagS;
 
 int searchFunctionFlag = 0; // tells the symlook that we're searching for a function, not a variable, when looking for an id
 
@@ -421,7 +422,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 			first_child = n->children->next;
 
 			for (; first_child != NULL; first_child = first_child->next) {
-				if (first_child->next == NULL) printf("%s", first_child->noted_type);
+				if (first_child->next == NULL ) printf("%s", first_child->noted_type);
 				else printf("%s,", first_child->noted_type);
 			}
 			printf(")\n");
@@ -622,7 +623,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		if (strcmp(type1, "undef") == 0) {
 			// incompatible type
-			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, getOperator(n->token->symbol));
+			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->line, n->column, n->children->noted_type, getOperator(n->token->symbol));
 			errorsSemanticNo++;
 		}
 
@@ -630,7 +631,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 	} else if (strcmp(n->token->symbol, "Return") == 0) {
 		if (n->children == NULL) return NULL;
 		
-		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		traverseAndCheckTree(n->children, tabname, global);
 
 		// check if return type is the same as required by the function
 		int valid = validReturnType(tabname, n->children->noted_type, global);
