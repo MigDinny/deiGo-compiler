@@ -21,6 +21,7 @@ typedef struct node {
 	struct node *children;
 	struct node *next;
 	int line, column;
+	int isCallFunction;
 
 	int printFuncParamsInNode;
 	int printFuncParams;

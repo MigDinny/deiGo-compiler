@@ -161,7 +161,7 @@ Expr: Expr OR Expr                                                              
         | Intlit                                                                                                {$$ = $1;} 
         | Reallit                                                                                               {$$ = $1;} 
         | Id                                                                                                    {$$ = $1;}  
-        | FuncInvocation                                                                                        {$$ = create_node("Call", 0, 0); add_child($$, $1);} 
+        | FuncInvocation                                                                                        {$$ = create_node("Call", 0, 0); add_child($$, $1); $1->isCallFunction = 1;} 
         | LPAR Expr RPAR                                                                                        {$$ = $2;} 
         | LPAR error RPAR																						{$$ = NULL; error = 1;}
 		;

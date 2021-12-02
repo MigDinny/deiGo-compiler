@@ -34,6 +34,7 @@ escape_sequence                     \\n|\\f|\\r|\\t|\\\"|(\\\\)
     int yylineno_aux = 0;
     char *strlit_buffer;
     int strlit_buffer_alloc_size = 100;
+    int errorsSemanticNo = 0;
 
     extern node_t *myprogram;
     extern symtab_t *global;
@@ -161,7 +162,7 @@ int main(int argc, char *argv[ ])
                 traverseAndCheckTree(myprogram, NULL, global);
                 
                 throwErrorDeclaredButNeverUsed(global);
-                printf("\n");
+                if (errorsSemanticNo > 0) printf("\n");
                 printTables(global);
                 printNotedTree(myprogram, 0, global);
             }
