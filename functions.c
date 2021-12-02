@@ -677,11 +677,9 @@ void printTableElements(elem_t * element){
 	if (element == NULL) return;
 
     // tparam = 0 -> não se mete param à frente
-
-	if (element->params == NULL && element->tparam == 0) printf("%s\t\t%s", element->id, element->type);
-	else if (element->params == NULL && element->tparam == 1) printf("%s\t\t%s\tparam", element->id, element->type);
-	else if (element->tparam == 0) printf("%s\t%s\t%s", element->id, element->params, element->type);
-	else printf("%s\t%s\t%s\tparam", element->id, element->params, element->type);
+	if (element->isFunction == 1) printf("%s\t%s\t%s", element->id, element->params, element->type);
+	else if (element->tparam == 0) printf("%s\t\t%s", element->id, element->type);
+	else if (element->tparam == 1) printf("%s\t\t%s\tparam", element->id, element->type);
 	//printf("  > %d", element->hits);
 
 	printf("\n");
