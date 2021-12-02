@@ -1,0 +1,15 @@
+package main;
+
+var a, b, x, y, z int;
+
+func main() {
+    if (x && y || z){
+        for {
+            /*         infinite loop       */
+            trap = infinite(a || b, x, y, z)
+            fmt.Println(trap)
+        }
+        fmt.Println("Depois do for")
+    }
+    fmt.Println("Depois do if")
+} // No new Line at the End

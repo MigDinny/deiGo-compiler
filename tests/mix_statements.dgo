@@ -1,0 +1,44 @@
+package main;
+
+var a, b, c int;
+
+func main(){
+
+    for {
+        if (a == b || c){
+            fmt.Println(abc(a && b, c));
+        } else{
+            fmt.Println(abc(a, b));
+        }
+    }
+
+    {
+        fmt.Println("Print sem Block");
+    };
+
+    {
+        fmt.Println("Print com Block");
+        fmt.Println("Tem mais de 2 statements");
+    };
+
+    {
+        fmt.Println("Statements vazios nao contam");
+        {};
+        {};
+    };
+
+    if 1 {};
+
+    if 2 {
+        arg,_ = strconv.Atoi(os.Args[3]);
+    } else {
+        a = 1.2
+    }
+
+}
+
+func abc(x int, z float32){
+    {
+        return x * z % z;
+    };
+}
