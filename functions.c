@@ -266,7 +266,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 					params_buffer_alloc_size += 10;
 				}
 
-				sprintf(params_buffer + strlen(params_buffer), ", %s", toLowerFirstChar(params_node->children->token->symbol));
+				sprintf(params_buffer + strlen(params_buffer), ",%s", toLowerFirstChar(params_node->children->token->symbol));
 			}
 
 			sprintf(params_buffer + strlen(params_buffer), ")");
@@ -400,7 +400,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		return n->noted_type;
 
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
-		
+		//printf("CALL isCallFunction: %d\n", n->children->isCallFunction);
 		node_t *first_child = n->children;
 		// call recursively on params first
 		for (first_child = first_child->next; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
@@ -439,7 +439,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		strncpy(substring, look->params + 1, strlen(look->params)-2);
 
 		
-		char *declared_param = strtok(substring, ", ");
+		char *declared_param = strtok(substring, ",");
 		node_t *param_node = n->children->next; // first parameter called
 
 		int errors = 0;
@@ -465,10 +465,10 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 				called_parameters_buffer_alloc_size += 20;
 			}
 			
-			sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ", %s", param_node->noted_type);
+			sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ",%s", param_node->noted_type);
 		
 			param_node = param_node->next; 
-			declared_param = strtok(NULL, ", ");
+			declared_param = strtok(NULL, ",");
 		}
 
 		if (param_node != NULL) {
@@ -481,7 +481,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 					called_parameters_buffer_alloc_size += 20;
 				}
 				
-				sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ", %s", param_node->noted_type);
+				sprintf(called_parameters_buffer + strlen(called_parameters_buffer), ",%s", param_node->noted_type);
 
 				param_node = param_node->next;
 			}
@@ -491,7 +491,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		if (errors > 0) {
 			//printf("<<%s>>\n", param_node->token->symbol);
-			printf("Line %d, column %d: Cannot find symbol %s(%s)\n", n->children->line, n->children->column, n->children->token->value, called_parameters_buffer + 2);
+			printf("Line %d, column %d: Cannot find symbol %s(%s)\n", n->children->line, n->children->column, n->children->token->value, called_parameters_buffer + 1);
 			errorsSemanticNo++;
 			n->noted_type = "undef";
 			n->children->noted_type = "undef";
@@ -505,7 +505,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = look->type;
 		n->children->noted_type = look->type;
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
+	} else if (strcmp(n->token->symbol, "Lt") == 0 || strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
 		// these require to be BOTH INT or BOTH FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -705,7 +705,7 @@ void printNotedTree(node_t *root, int init_depth, symtab_t *global){
         else if (strcmp(root->token->symbol, "StrLit") == 0) printf("StrLit(\"%s\") - %s\n", root->token->value, root->noted_type);
         else { // é literal
 			if (strcmp(root->token->symbol, "Id") == 0){
-
+				//printf("FLAG isCallFunction: %d\n", root->isCallFunction);
 				if (root->isCallFunction == 1) searchFunctionFlag = 1;
 				elem_t * look = symtab_look(root->funcTabName, global, root->token->value, 0);
 				searchFunctionFlag = 0;

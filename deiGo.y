@@ -118,7 +118,7 @@ Statement: Id Assign Expr                                                       
         | FOR      LBRACE Statement2 RBRACE                                                                     {$$ = create_node("For", $1->line, $1->column); temp = create_block_node(); add_child(temp, $3); add_child($$, temp); temp = NULL;}
         | RETURN Expr                                                                                           {$$ = create_node("Return", $1->line, $1->column); add_child($$, $2);}
         | RETURN                                                                                                {$$ = create_node("Return", $1->line, $1->column);}
-        | FuncInvocation                                                                                        {$$ = create_node("Call", 0, 0); add_child($$, $1);}
+        | FuncInvocation                                                                                        {$$ = create_node("Call", 0, 0); add_child($$, $1); $1->isCallFunction = 1;}
         | ParseArgs                                                                                             {$$ = $1;}
         | PRINT LPAR Expr RPAR                                                                                  {$$ = create_node("Print", $1->line, $1->column); add_child($$, $3);}
         | PRINT LPAR Strlit2 RPAR                                                                               {$$ = create_node("Print", $1->line, $1->column); add_child($$, $3);}
