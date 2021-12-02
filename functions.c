@@ -360,7 +360,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		n->noted_type = "string";
 		// return string type
 		return n->noted_type;
-	} else if (strcmp(n->token->symbol, "Add") == 0 || strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
+	} else if (strcmp(n->token->symbol, "Sub") == 0 || strcmp(n->token->symbol, "Mul") == 0 || strcmp(n->token->symbol, "Div") == 0 || strcmp(n->token->symbol, "Mod") == 0)  { 
 		// both types must be equal and must be INT or FLOAT32
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
@@ -376,6 +376,24 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		n->noted_type = "undef";
 		return n->noted_type;
+	} else if (strcmp(n->token->symbol, "Add") == 0) {
+
+		// both types must be equal and must be INT or FLOAT32 or STRING
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
+		
+		if ( (strcmp(type1, "int") == 0 && strcmp(type2, "int") == 0) || (strcmp(type1, "float32") == 0 && strcmp(type2, "float32") == 0) || (strcmp(type1, "string") == 0 && strcmp(type2, "string") == 0) ) {
+			// INT-INT or FLOAT-FLOAT or STRING-STRING
+			n->noted_type = type1;
+			return n->noted_type;
+		}
+
+		// the types dont meet the above requirements
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
+
+		n->noted_type = "undef";
+		return n->noted_type;
+
 	} else if (strcmp(n->token->symbol, "Call") == 0) {
 		
 		node_t *first_child = n->children;
