@@ -116,8 +116,11 @@ int count_children(node_t *first_child) {
 /*
 VarDecl
 FuncDecl
+
+returns 1 if sucess
+0 if duplicate
 */
-void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
+int insert_element(symtab_t *table, elem_t *new, node_t * origin) {
 	
 	new->line = origin->line;
 	new->column = origin->column; 
@@ -125,7 +128,7 @@ void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
 	if (symtab_find_duplicate(table, new->id) == 1) {
 		// throw error ALREADY EXISTS
 		printf("Line %d, column %d: Symbol %s already defined\n", origin->line, origin->column, new->id);
-		return;
+		return 0;
 	}
 
 	if (table->first_element == NULL)
@@ -136,6 +139,8 @@ void insert_element(symtab_t *table, elem_t *new, node_t * origin) {
 		
 		last_element->next = new;
 	}
+
+	return 1;
 }
 
 symtab_t* create_table(symtab_t *global, elem_t *origin) {
@@ -201,6 +206,7 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			// if it's a FuncDecl, create a new table
 			// if it's a ParamDecl, set a flag
 		// NO: do nothing!
+
 		if (strcmp(current_node->token->symbol, "VarDecl") == 0) {
 			// VARDECL: 1st child > type    2nd child > id
 			char *id = current_node->children->next->token->value;
@@ -267,17 +273,22 @@ void traverseAndPopulateTable(symtab_t *tab, node_t *node) {
 			elem_t *new = create_element(id, params_buffer, type, 1);
 
 			// insert it
-			insert_element(tab, new, current_node->children->children);
+			int status = insert_element(tab, new, current_node->children->children);
+
+			if (status == 1) {
+				// create new table for this function
+				symtab_t *newtab = create_table(tab, new);
 
 
-			// create new table for this function
-			symtab_t *newtab = create_table(tab, new);
-
-
-			// get funcbody and call RECURSION for the params and then for the func body
-			node_t *funcbody = current_node->children->next;
-			traverseAndPopulateTable(newtab, params_node_father);
-			traverseAndPopulateTable(newtab, funcbody);
+				// get funcbody and call RECURSION for the params and then for the func body
+				node_t *funcbody = current_node->children->next;
+				traverseAndPopulateTable(newtab, params_node_father);
+				traverseAndPopulateTable(newtab, funcbody);
+			} else {
+				free(new);
+				current_node->invalidFuncDecl = 1;
+				//setHits(current_node->children->next, current_node->children->children->token->value, tab);
+			}
 						
 		} else if (strcmp(current_node->token->symbol, "ParamDecl") == 0) {
 			// PARAMDECL: 1st child > type
@@ -601,6 +612,8 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		// it's not a NOTED NODE AND does not require any specific action
 		// but needs to process its children
 		// if this node is FuncDecl, change tab reference to this function's table
+		// if this node is an invalid funcdecl, dont process its children
+		if (strcmp(n->token->symbol, "FuncDecl") == 0 && n->invalidFuncDecl == 1) return NULL;
 		if (strcmp(n->token->symbol, "FuncDecl") == 0) tabname = n->children->children->token->value;
 		for (node_t *first_child = n->children; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 	}
@@ -753,6 +766,7 @@ int symtab_find_duplicate(symtab_t *tab, char *id) {
 	if (func_aux == NULL) return 0;													
 	else {
 		while (func_aux_element != NULL) {
+			
 			if (strcmp(func_aux_element->id, id) != 0) func_aux_element = func_aux_element->next;
 			else if (strcmp(func_aux_element->id, id) == 0) return 1;
 		}
@@ -766,16 +780,20 @@ int symtab_find_duplicate(symtab_t *tab, char *id) {
 */
 void throwErrorDeclaredButNeverUsed(symtab_t *global) {		
 
-	symtab_t * global_aux = global;
-	elem_t * global_aux_element = global->first_element;
-	
+	symtab_t * global_aux = global->next;
+
+	if (global_aux == NULL) return; // no need to continue, we dont throw errors in global table and there are no other tables
+
+	elem_t * global_aux_element = NULL;
+	global_aux_element = global_aux->first_element;
+
 	// printf("\n\n--- MAIN -> THROW_ERROR_DECLARED_BUT_NEVER_USED ---\n\n");
 	while (global_aux != NULL){
 			while (global_aux_element != NULL) {
 				//printf("<%s>", global_aux_element->id);
 				
 				// printf("Element id: %s -- params %s -- type %s -- line %d -- column %d\n", global_aux_element->id, global_aux_element->params, global_aux_element->type, global_aux_element->line, global_aux_element->column);
-				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0) printf("Line %d, column %d: Symbol %s declared but never used\n", global_aux_element->line, global_aux_element->column, global_aux_element->id);
+				if (global_aux_element->hits == 0 && global_aux_element->params == NULL && global_aux_element->tparam == 0 && strcmp(global_aux_element->id, "return") != 0) printf("Line %d, column %d: Symbol %s declared but never used\n", global_aux_element->line, global_aux_element->column, global_aux_element->id);
 				global_aux_element = global_aux_element->next;
 		}
 		global_aux = global_aux->next;
@@ -825,4 +843,18 @@ int validReturnType(char *tabname, char *type, symtab_t *global) {
 	}
 
 	return 0;
+}
+
+void setHits(node_t *n, char *tabname, symtab_t *global) {
+	if (n == NULL) return;
+	if (strcmp(n->token->symbol, "VarDecl") == 0) return;
+	
+	if ( strcmp(n->token->symbol, "Id") == 0) {
+		elem_t *look = symtab_look(tabname, global, n->token->value, 0);
+		if (look != NULL) look->hits++;
+	} 
+
+	// continue to next node and children node
+	setHits(n->children, tabname, global);
+	setHits(n->next, tabname, global);
 }

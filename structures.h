@@ -24,6 +24,8 @@ typedef struct node {
 
 	int printFuncParamsInNode;
 	int printFuncParams;
+
+	int invalidFuncDecl;
 	
 	char *funcTabName;
 } node_t;

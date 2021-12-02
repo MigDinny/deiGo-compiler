@@ -11,7 +11,7 @@ void add_next(node_t *node, node_t *next);
 void print_tree(node_t *root, int init_depth);
 int count_children(node_t *first_child);
 
-void insert_element(symtab_t *table, elem_t *new, node_t* origin);
+int insert_element(symtab_t *table, elem_t *new, node_t* origin);
 symtab_t* create_table(symtab_t *global, elem_t *origin);
 symtab_t* create_global_table();
 elem_t* create_element(char *id, char *params, char *type, int isFunction);
@@ -27,3 +27,4 @@ void throwErrorDeclaredButNeverUsed(symtab_t *global);
 char * toLowerFirstChar(char *s);
 char * getOperator(char * symbol);
 int validReturnType(char *tabname, char *type, symtab_t *global);
+void setHits(node_t *n, char *tabname, symtab_t *global);
