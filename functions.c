@@ -7,6 +7,8 @@
 extern int yycolumnno_aux;
 extern int yylineno_aux;
 
+int searchFunctionFlag = 0; // tells the symlook that we're searching for a function, not a variable, when looking for an id
+
 node_t* create_node(char* symbol, int line, int column) {
 
 	node_t *n = (node_t*) malloc(sizeof(node_t));
@@ -370,8 +372,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		for (first_child = first_child->next; first_child != NULL; first_child = first_child->next) traverseAndCheckTree(first_child, tabname, global);
 
 		first_child = n->children;
-
+		
+		searchFunctionFlag = 1; // turn on flag
 		elem_t *look = symtab_look(tabname, global, first_child->token->value, 0);
+		searchFunctionFlag = 0; // turn off flag
+
 		if (look == NULL) {
 			// ERROR NOT DEFINED
 			first_child = n->children;
@@ -533,8 +538,9 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		// assigned type must be the same as the variable's type receiving the value
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 		char *type2 = traverseAndCheckTree(n->children->next, tabname, global);
-		// the types are not equal, throw error
-		if (strcmp(type1, type2) != 0) {
+
+		// the types are not equal or one of them is UNDEF, throw error
+		if (strcmp(type1, type2) != 0 || strcmp(type1, "undef") == 0 || strcmp(type2, "undef") == 0) {
 			printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 		}
 		// no need to set noted_type
@@ -573,6 +579,17 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 
 		if (strcmp(type1, "undef") == 0) {
 			// incompatible type
+			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, getOperator(n->token->symbol));
+		}
+
+		return NULL;
+	} else if (strcmp(n->token->symbol, "Return") == 0) {
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
+
+		// check if return type is the same as required by the function
+		int valid = validReturnType(tabname, n->children->noted_type, global);
+
+		if (valid == 0) { 
 			printf("Line %d, column %d: Incompatible type %s in %s statement\n", n->children->line, n->children->column, n->children->noted_type, getOperator(n->token->symbol));
 		}
 
@@ -684,11 +701,16 @@ elem_t* symtab_look(char *tabname, symtab_t *global, char *id, int ignoreIsDecla
 		found = func->first_element;
 
 		while (found != NULL) {
-			if (strcmp(found->id, id) == 0) {
-				if (found->isFunction == 1) break; // if its a function, element is found.
-				else if (found->isDeclared == 1 || ignoreIsDeclared == 1) break;  // if it's variable, needs to be declared first. so, only find it if it is already declared
+
+			// if we are looking for a variable OR a function
+			if (searchFunctionFlag == 0) {
+				if (strcmp(found->id, id) == 0 && found->isFunction == 0 && (found->isDeclared == 1 || ignoreIsDeclared == 1)) break;
+			} else {
+				if (strcmp(found->id, id) == 0 && found->isFunction == 1) break;
 			}
+
 			found = found->next;
+		
 		}
 		if (found != NULL) return found; // element found
 	}
@@ -696,10 +718,14 @@ elem_t* symtab_look(char *tabname, symtab_t *global, char *id, int ignoreIsDecla
 	found = global->first_element;
 
 	while (found != NULL) {
-		if (strcmp(found->id, id) == 0) {
-			if (found->isFunction == 1) break; // if its a function, element is found.
-			else if (found->isDeclared == 1 || ignoreIsDeclared == 1) break; // if it's variable, needs to be declared first. so, only find it if it is already declared
+		
+		// if we are looking for a variable OR a function
+		if (searchFunctionFlag == 0) {
+			if (strcmp(found->id, id) == 0 && found->isFunction == 0 && (found->isDeclared == 1 || ignoreIsDeclared == 1)) break;
+		} else {
+			if (strcmp(found->id, id) == 0 && found->isFunction == 1) break;
 		}
+
 		found = found->next;
 	}
 
@@ -769,7 +795,7 @@ char * getOperator(char * symbol){
 	else if (strcmp(symbol, "Assign") == 0) return "=";
 	else if (strcmp(symbol, "Eq") == 0) return "==";
 	else if (strcmp(symbol, "Ne") == 0) return "!=";
-	else if (strcmp(symbol, "Ge ") == 0) return ">=";
+	else if (strcmp(symbol, "Ge") == 0) return ">=";
 	else if (strcmp(symbol, "Le") == 0) return "<=";
 	else if (strcmp(symbol, "Not") == 0) return "!";
 	else if (strcmp(symbol, "Add") == 0) return "+";
@@ -778,6 +804,22 @@ char * getOperator(char * symbol){
 	else if (strcmp(symbol, "Mul") == 0) return "*";
 	else if (strcmp(symbol, "Mod") == 0) return "%%";
 	else if (strcmp(symbol, "ParseArgs") == 0) return "strconv.Atoi";
+	else if (strcmp(symbol, "Return") == 0) return "return";
 	else if (strcmp(symbol, "Print") == 0) return "fmt.Println";
 	else return symbol;
+}
+
+int validReturnType(char *tabname, char *type, symtab_t *global) {
+
+	elem_t *elem = global->first_element;
+
+	while (elem != NULL) {
+		if (elem->isFunction == 1) {
+			if (strcmp(elem->id, tabname) == 0 && strcmp(elem->type, type) == 0) return 1;
+		}
+
+		elem = elem->next;
+	}
+
+	return 0;
 }

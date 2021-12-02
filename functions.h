@@ -26,3 +26,4 @@ int symtab_find_duplicate(symtab_t *tab, char *id);
 void throwErrorDeclaredButNeverUsed(symtab_t *global);
 char * toLowerFirstChar(char *s);
 char * getOperator(char * symbol);
+int validReturnType(char *tabname, char *type, symtab_t *global);
