@@ -466,7 +466,11 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 		
 		// type is the returned type of the first child (function)
-		n->noted_type = look->type;
+
+		// TODO: this is working, if it's NONE then "Call - none" will be printed only "Call" but this might change in the future.
+		if (strcmp(look->type, "none") != 0) n->noted_type = look->type;
+		else n->noted_type = NULL; 
+		
 		n->children->noted_type = look->type;
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "Lt") == 0|| strcmp(n->token->symbol, "Gt") == 0 || strcmp(n->token->symbol, "Le") == 0 || strcmp(n->token->symbol, "Ge") == 0 ) {
