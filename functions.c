@@ -535,7 +535,7 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		}
 
 		// both types are not INT or FLOAT32, throw error
-		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", yylineno_aux, yycolumnno_aux, getOperator(n->token->symbol), type1, type2);
+		printf("Line %d, column %d: Operator %s cannot be applied to types %s, %s\n", n->line, n->column, getOperator(n->token->symbol), type1, type2);
 		errorsSemanticNo++;
 		n->noted_type = "bool";
 		return n->noted_type;
@@ -602,9 +602,15 @@ char* traverseAndCheckTree(node_t *n, char *tabname, symtab_t *global) {
 		return NULL;
 	} else if (strcmp(n->token->symbol, "Minus") == 0 || strcmp(n->token->symbol, "Plus") == 0) {
 		// process child
-		traverseAndCheckTree(n->children, tabname, global);
+		char *type1 = traverseAndCheckTree(n->children, tabname, global);
 
-		n->noted_type = n->children->noted_type;
+		if (strcmp(type1, "float32") != 0 && strcmp(type1, "int") != 0) {
+			printf("Line %d, column %d: Operator %s cannot be applied to type %s\n", n->line, n->column, getOperator(n->token->symbol), type1);
+			errorsSemanticNo++;
+			n->noted_type = "undef";
+		} else n->noted_type = n->children->noted_type;
+
+		
 		return n->noted_type;
 	} else if (strcmp(n->token->symbol, "ParseArgs") == 0) {
 		char *type1 = traverseAndCheckTree(n->children, tabname, global);
@@ -858,8 +864,8 @@ char * getOperator(char * symbol){
 	else if (strcmp(symbol, "Ge") == 0) return ">=";
 	else if (strcmp(symbol, "Le") == 0) return "<=";
 	else if (strcmp(symbol, "Not") == 0) return "!";
-	else if (strcmp(symbol, "Add") == 0) return "+";
-	else if (strcmp(symbol, "Sub") == 0) return "-";
+	else if (strcmp(symbol, "Add") == 0 || strcmp(symbol, "Plus") == 0) return "+";
+	else if (strcmp(symbol, "Sub") == 0 || strcmp(symbol, "Minus") == 0) return "-";
 	else if (strcmp(symbol, "Div") == 0) return "/";
 	else if (strcmp(symbol, "Mul") == 0) return "*";
 	else if (strcmp(symbol, "Mod") == 0) return "%%";

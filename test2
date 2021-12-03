@@ -1,0 +1,20 @@
+package main
+
+
+var b2 bool;
+var b3 bool;
+var b bool;
+
+func main() {
+
+
+	b = b2 < b3
+	b3 = -1 < b2
+	b3 = b2 != 0
+	b2 = b > -b3
+
+	b = b2 == -b4;
+    b = b2 != b4 == b4 != (-b3);
+	
+	
+}
