@@ -868,7 +868,7 @@ char * getOperator(char * symbol){
 	else if (strcmp(symbol, "Sub") == 0 || strcmp(symbol, "Minus") == 0) return "-";
 	else if (strcmp(symbol, "Div") == 0) return "/";
 	else if (strcmp(symbol, "Mul") == 0) return "*";
-	else if (strcmp(symbol, "Mod") == 0) return "%%";
+	else if (strcmp(symbol, "Mod") == 0) return "%";
 	else if (strcmp(symbol, "ParseArgs") == 0) return "strconv.Atoi";
 	else if (strcmp(symbol, "Return") == 0) return "return";
 	else if (strcmp(symbol, "Print") == 0) return "fmt.Println";
